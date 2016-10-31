@@ -142,10 +142,7 @@ def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
 
 #   START
 
-def process_image(image_name):
-
-    # reading in an image
-    image = mpimg.imread('test_images/' + image_name)
+def process_image(image):
 
     # printing out some stats and plotting
     print('This image is:', type(image))
@@ -221,9 +218,11 @@ def process_image(image_name):
     α = 0.8
     β = 1.
     λ = 0.
-    combo = weighted_img(line_image, color_edges, α, β, λ)
-    plt.imshow(combo)
-    plt.show()
+    result = weighted_img(line_image, color_edges, α, β, λ)
+    # plt.imshow(result)
+    # plt.show()
+
+    return result
 
 
 #
@@ -239,10 +238,21 @@ def process_image(image_name):
 images = ['solidWhiteCurve.jpg', 'solidWhiteRight.jpg', 'solidYellowCurve.jpg', 'solidYellowCurve2.jpg',
           'solidYellowLeft.jpg', 'whiteCarLaneSwitch.jpg']
 
-process_image(images[1])
+# process_image(images[1])
 
 for image_name in images:
-    print(image_name)
-    process_image(image_name)
+    image = mpimg.imread('test_images/' + image_name)
+    result = process_image(image)
+    mpimg.imsave("RENDERED_"+image_name, result)
 
 # TODO: run your solution on all test_images and make copies into the test_images directory).
+
+
+# Import everything needed to edit/save/watch video clips
+from moviepy.editor import VideoFileClip
+from IPython.display import HTML
+
+# white_output = 'white.mp4'
+# clip1 = VideoFileClip("solidWhiteRight.mp4")
+# white_clip = clip1.fl_image(process_image)
+# white_clip.write_videofile(white_output, audio=False)
