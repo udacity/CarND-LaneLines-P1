@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 
-image = mpimg.imread('../test_images/solidWhiteRight.jpg')
+image = mpimg.imread('solidWhiteRight.jpg')
 print('This image is: ', type(image), 'with dimensions:', image.shape)
 
 ysize = image.shape[0]

@@ -5,7 +5,7 @@ import numpy as np
 # Read in the image and print out some stats
 # Note: in the previous example we were reading a .jpg
 # Here we read a .png and convert to 0,255 bytescale
-image = (mpimg.imread('../test_images/test.png') * 255).astype('uint8')
+image = (mpimg.imread('test.png') * 255).astype('uint8')
 
 # print('image type: ', type(image), 'image dimensions: ', image.shape)
 
