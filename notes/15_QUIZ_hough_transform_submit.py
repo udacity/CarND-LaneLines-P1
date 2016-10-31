@@ -37,6 +37,9 @@ print('range bounds: ', vertices)
 cv2.fillPoly(mask, vertices, ignore_mask_color)
 masked_edges = cv2.bitwise_and(edges, mask)
 
+plt.imshow(masked_edges)
+plt.show()
+
 # Define the Hough transform parameters
 # Make a blank the same size as our image to draw on
 rho = 2 # distance resolution in pixels of the Hough grid
@@ -55,6 +58,9 @@ lines = cv2.HoughLinesP(masked_edges, rho, theta, threshold, np.array([]),
 for line in lines:
     for x1,y1,x2,y2 in line:
         cv2.line(line_image,(x1,y1),(x2,y2),(255,0,0),10)
+
+plt.imshow(line_image)
+plt.show()
 
 # Create a "color" binary image to combine with line image
 color_edges = np.dstack((edges, edges, edges))
