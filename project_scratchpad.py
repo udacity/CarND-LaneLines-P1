@@ -190,7 +190,7 @@ def process_image(image):
         ]
     ], dtype=np.int32)
 
-    print('region of interest vertices: ', vertices)
+    # print('region of interest vertices: ', vertices)
 
     masked_edges = region_of_interest(edges, vertices)
 
@@ -240,21 +240,27 @@ images = ['solidWhiteCurve.jpg', 'solidWhiteRight.jpg', 'solidYellowCurve.jpg', 
 
 # process_image(images[1])
 
+# TODO: run your solution on all test_images and make copies into the test_images directory).
+
 for image_name in images:
     image = mpimg.imread('test_images/' + image_name)
     result = process_image(image)
-    plt.imshow(result)
-    plt.show()
+    # plt.imshow(result)
+    # plt.show()
     mpimg.imsave("RENDERED_"+image_name, result)
 
-# TODO: run your solution on all test_images and make copies into the test_images directory).
 
 
 # Import everything needed to edit/save/watch video clips
 from moviepy.editor import VideoFileClip
 from IPython.display import HTML
 
-# white_output = 'white.mp4'
-# clip1 = VideoFileClip("solidWhiteRight.mp4")
-# white_clip = clip1.fl_image(process_image)
-# white_clip.write_videofile(white_output, audio=False)
+white_output = 'white.mp4'
+clip1 = VideoFileClip("solidWhiteRight.mp4")
+white_clip = clip1.fl_image(process_image)
+white_clip.write_videofile(white_output, audio=False)
+
+yellow_output = 'yellow.mp4'
+clip2 = VideoFileClip('solidYellowLeft.mp4')
+yellow_clip = clip2.fl_image(process_image)
+yellow_clip.write_videofile(yellow_output, audio=False)
