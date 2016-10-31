@@ -210,7 +210,7 @@ def process_image(image):
     min_line_length = 40
     max_line_gap = 20
 
-    line_image = hough_lines(image, masked_edges, rho, theta, threshold, min_line_length, max_line_gap)
+    result = hough_lines(image, masked_edges, rho, theta, threshold, min_line_length, max_line_gap)
 
     # Create a "color" binary image to combine with line image
     color_edges = np.dstack((edges, edges, edges))
@@ -218,7 +218,7 @@ def process_image(image):
     α = 0.8
     β = 1.
     λ = 0.
-    result = weighted_img(line_image, color_edges, α, β, λ)
+    result = weighted_img(result, image, α, β, λ)
     # plt.imshow(result)
     # plt.show()
 
@@ -243,6 +243,8 @@ images = ['solidWhiteCurve.jpg', 'solidWhiteRight.jpg', 'solidYellowCurve.jpg', 
 for image_name in images:
     image = mpimg.imread('test_images/' + image_name)
     result = process_image(image)
+    plt.imshow(result)
+    plt.show()
     mpimg.imsave("RENDERED_"+image_name, result)
 
 # TODO: run your solution on all test_images and make copies into the test_images directory).
