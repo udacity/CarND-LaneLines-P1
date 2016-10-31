@@ -1,22 +1,5 @@
 import numpy as np
 
-def select_color(image):
-    print('image type: ', type(image), 'image dimensions: ', image.shape)
-
-    # Grab the x and y size and make a copy of the image
-    ysize = image.shape[0]
-    xsize = image.shape[1]
-    color_select = np.copy(image)
-    line_image = np.copy(image)
-
-    # Define color selection criteria
-    # MODIFY THESE VARIABLES TO MAKE YOUR COLOR SELECTION
-    red_threshold = 200
-    green_threshold = 200
-    blue_threshold = 200
-
-    rgb_threshold = [red_threshold, green_threshold, blue_threshold]
-
 def select_region(image, left_bottom, right_bottom, apex):
     ysize = image.shape[0]
     xsize = image.shape[1]
