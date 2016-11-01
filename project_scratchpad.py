@@ -86,7 +86,7 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-def draw_lines(img, lines, color=[255, 0, 0], thickness=5):
+def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
     """
     NOTE: this is the function you might want to use as a starting point once you want to
     average/extrapolate the line segments you detect to map out the full
@@ -106,8 +106,20 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=5):
 
     sides = [[], []]
 
+    all_x1 = []
+    all_y1 = []
+    all_x2 = []
+    all_y2 = []
+    all_slopes = []
+
     for line in lines:
         for x1, y1, x2, y2 in line:
+            all_x1.append(x1)
+            all_x2.append(x2)
+            all_y1.append(y1)
+            all_y2.append(y2)
+            all_slopes.append((y2 - y1) / (x2 - x1))
+
             # ignore horizontal lines below a certain angle
             angle = math.atan2(y2 - y1, x2 - x1) * 180.0 / np.pi
             if -45 < angle <= -30:
@@ -124,57 +136,69 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=5):
 
 
     # draw left line
-    all_x1 = []
-    all_y1 = []
-    all_x2 = []
-    all_y2 = []
-    all_slopes = []
+    left_x1 = []
+    left_y1 = []
+    left_x2 = []
+    left_y2 = []
+    left_slopes = []
 
     for x1, y1, x2, y2, angle in sides[0]:
-        all_x1.append(x1)
-        all_x2.append(x2)
-        all_y1.append(y1)
-        all_y2.append(y2)
-        all_slopes.append((y2 - y1) / (x2 - x1))
+        left_x1.append(x1)
+        left_x2.append(x2)
+        left_y1.append(y1)
+        left_y2.append(y2)
+        left_slopes.append((y2 - y1) / (x2 - x1))
 
-    x1 = min(all_x1)
-    x2 = max(all_x2)
-    y1 = max(all_y1)
-    y2 = min(all_y2)
+    x1 = min(left_x1)
+    x2 = max(left_x2)
+    y1 = max(left_y1)
+    y2 = min(left_y2)
 
-    cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+    m = (y2-y1)/(x2-x1)
+    # m = sum(left_slopes) / len(left_slopes)
+    b = y1-m*x1
 
+    min_y1 = int(img.shape[0])
+    min_x1 = int((min_y1-b)/m)
+    y2 = min(left_y2)
+    max_x2 = int((y2 - b) / m)
+
+    y2 = min(left_y1+left_y2)
+    print('left min y', y2)
+
+    # cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+    cv2.line(img, (min_x1, min_y1), (max_x2, y2), color, thickness)
 
 
     # draw right line
-    all_x1 = []
-    all_y1 = []
-    all_x2 = []
-    all_y2 = []
-    all_slopes = []
+    right_x1 = []
+    right_y1 = []
+    right_x2 = []
+    right_y2 = []
+    right_slopes = []
 
     for x1, y1, x2, y2, angle in sides[1]:
-        all_x1.append(x1)
-        all_x2.append(x2)
-        all_y1.append(y1)
-        all_y2.append(y2)
-        all_slopes.append((y2-y1)/(x2-x1))
+        right_x1.append(x1)
+        right_x2.append(x2)
+        right_y1.append(y1)
+        right_y2.append(y2)
+        right_slopes.append((y2-y1)/(x2-x1))
 
-    x1 = min(all_x1)
-    x2 = max(all_x2)
-    y1 = min(all_y1)
-    y2 = max(all_y2)
+    x1 = min(right_x1)
+    x2 = max(right_x2)
+    y1 = min(right_y1)
+    y2 = max(right_y2)
 
-    avg_slope = sum(all_slopes)/len(all_slopes)
-    max_y = img.shape[0]
+    m = (y2-y1)/(x2-x1)
+    # m = sum(right_slopes)/len(right_slopes)
+    b = y1-m*x1
 
-    print('slope of line: ', avg_slope)
-    print('x a y: ', max(all_x2))
-    print('~x a y: ', (max(all_y2)/avg_slope))
-    print('~x a max_y: ', max_y/avg_slope)
+    y1 = min(right_y1)
+    x1 = int((y1-b)/m)
+    y2 = int(img.shape[0])
+    x2 = int((y2-b)/m)
 
     cv2.line(img, (x1, y1), (x2, y2), color, thickness)
-    # cv2.line(img, (x1, y1), (min(int(max_y/avg_slope), max(all_x2)), max_y), color, thickness)
 
 
 
@@ -321,12 +345,18 @@ for image_name in os.listdir("test_images/"):
 from moviepy.editor import VideoFileClip
 from IPython.display import HTML
 
-white_output = 'white.mp4'
-clip1 = VideoFileClip("solidWhiteRight.mp4")
-white_clip = clip1.fl_image(process_image)
-white_clip.write_videofile(white_output, audio=False)
+# white_output = 'white.mp4'
+# clip1 = VideoFileClip("solidWhiteRight.mp4")
+# white_clip = clip1.fl_image(process_image)
+# white_clip.write_videofile(white_output, audio=False)
 
-yellow_output = 'yellow.mp4'
-clip2 = VideoFileClip('solidYellowLeft.mp4')
-yellow_clip = clip2.fl_image(process_image)
-yellow_clip.write_videofile(yellow_output, audio=False)
+# yellow_output = 'yellow.mp4'
+# clip2 = VideoFileClip('solidYellowLeft.mp4')
+# yellow_clip = clip2.fl_image(process_image)
+# yellow_clip.write_videofile(yellow_output, audio=False)
+
+
+# challenge_output = 'extra.mp4'
+# clip2 = VideoFileClip('challenge.mp4')
+# challenge_clip = clip2.fl_image(process_image)
+# challenge_clip.write_videofile(challenge_output, audio=False)
