@@ -86,7 +86,7 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-def draw_lines(img, lines, color=[255, 0, 0], thickness=2):
+def draw_lines(img, lines, color=[255, 0, 0], thickness=5):
     """
     NOTE: this is the function you might want to use as a starting point once you want to
     average/extrapolate the line segments you detect to map out the full
@@ -103,9 +103,93 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=2):
     If you want to make the lines semi-transparent, think about combining
     this function with the weighted_img() function below
     """
+
+    sides = [[], []]
+
     for line in lines:
         for x1, y1, x2, y2 in line:
-            cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+            # ignore horizontal lines below a certain angle
+            angle = math.atan2(y2 - y1, x2 - x1) * 180.0 / np.pi
+            if -45 < angle <= -30:
+                # negative angle is left line
+                # print('(side,x1,y1,x2,y2,angle) = (', 'L',',', x1, ',', y1, ',', x2, ',', y2, ',', angle, ')')
+                sides[0].append(tuple((x1, y1, x2, y2, angle)))
+
+                # cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+            elif 25 < angle <= 45:
+                # positive angle is right line
+                # print('(side,x1,y1,x2,y2,angle) = (', 'R', ',', x1, ',', y1, ',', x2, ',', y2, ',', angle, ')')
+                sides[1].append(tuple((x1, y1, x2, y2, angle)))
+                # cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+            else:
+                print('XXX (side,x1,y1,x2,y2,angle) = (', 'R', ',', x1, ',', y1, ',', x2, ',', y2, ',', angle, ')')
+
+    # draw left line
+    all_x1 = []
+    all_y1 = []
+    all_x2 = []
+    all_y2 = []
+
+    for x1, y1, x2, y2, angle in sides[0]:
+        all_x1.append(x1)
+        all_x2.append(x2)
+        all_y1.append(y1)
+        all_y2.append(y2)
+
+    avg_x1 = sum(all_x1) / float(len(all_x1))
+    avg_y1 = sum(all_y1) / float(len(all_y1))
+    avg_x2 = sum(all_x2) / float(len(all_x2))
+    avg_y2 = sum(all_y2) / float(len(all_y2))
+    avg_slope = (avg_y2 - avg_y1) / (avg_x2 - avg_x1)
+
+    print("avg all x1: ", avg_x1)
+    print("avg all y1: ", avg_y1)
+    print("avg all x2: ", avg_x2)
+    print("avg all y2: ", avg_y2)
+    print("avg slope (m): ", avg_slope)
+
+    print("(min, max) x1: ", min(all_x1), max(all_x1))
+    print("(min, max) x2: ", min(all_x2), max(all_x2))
+    print("(min, max) y1: ", min(all_y1), max(all_y1))
+    print("(min, max) y2: ", min(all_y2), max(all_y2))
+
+
+    cv2.line(img, (min(all_x1), max(all_y1)), (max(all_x2), min(all_y2)), color, thickness)
+
+    # draw right line
+    all_x1 = []
+    all_y1 = []
+    all_x2 = []
+    all_y2 = []
+    all_slopes = []
+
+    for x1, y1, x2, y2, angle in sides[1]:
+        all_x1.append(x1)
+        all_x2.append(x2)
+        all_y1.append(y1)
+        all_y2.append(y2)
+        all_slopes.append((y2-y1)/(x2-x1))
+
+    # cv2.line(img, (min(all_x1), min(all_y1)), (min(all_x2), max(all_y2)), color, thickness)
+    # cv2.line(img, (649, 420), (728, 469), color, thickness)
+    # cv2.line(img, (497, 326), (574, 372), color, thickness)
+
+    x1 = min(all_x1)
+    x2 = max(all_x2)
+    y1 = min(all_y1)
+    y2 = max(all_y2)
+
+    avg_slope = sum(all_slopes)/len(all_slopes)
+    max_y = img.shape[0]
+
+    print('slope of line: ', avg_slope)
+    print('x a y: ', max(all_x2))
+    print('~x a y: ', (max(all_y2)/avg_slope))
+    print('~x a max_y: ', max_y/avg_slope)
+
+    cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+    # cv2.line(img, (x1, y1), (min(int(max_y/avg_slope), max(all_x2)), max_y), color, thickness)
+
 
 
 def hough_lines(orig_img, img, rho, theta, threshold, min_line_len, max_line_gap):
@@ -143,12 +227,11 @@ def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
 #   START
 
 def process_image(image):
-
     # printing out some stats and plotting
-    print('This image is:', type(image))
-    print('with dimesions:', image.shape)
-    print('width: ', image.shape[1])
-    print('height: ', image.shape[0])
+    # print('This image is:', type(image))
+    # print('with dimesions:', image.shape)
+    # print('width: ', image.shape[1])
+    # print('height: ', image.shape[0])
 
     # plt.imshow(image)
     # plt.show()
@@ -177,17 +260,17 @@ def process_image(image):
     # This time we are defining a four sided polygon to mask
     imshape = image.shape
 
-    bottom_offset = 50
+    bottom_offset = 55
     img_height = imshape[0]
     img_width = imshape[1]
 
     # (W, H) == (x, y)
     vertices = np.array([
         [
-            (bottom_offset, img_height),               # bottom left
-            (img_width * 0.48, img_height * 0.60),     # top left
-            (img_width * 0.54, img_height * 0.60),     # top right
-            (img_width - bottom_offset, img_height)    # bottom right
+            (bottom_offset, img_height),  # bottom left
+            (img_width * 0.48, img_height * 0.60),  # top left
+            (img_width * 0.54, img_height * 0.60),  # top right
+            (img_width - bottom_offset, img_height)  # bottom right
         ]
     ], dtype=np.int32)
 
@@ -205,11 +288,11 @@ def process_image(image):
     # min_line_length = 10
     # max_line_gap = 1
 
-    rho = 1
-    theta = np.pi / 230
-    threshold = 20
-    min_line_length = 25
-    max_line_gap = 40
+    rho = 2
+    theta = np.pi / 180
+    threshold = 40
+    min_line_length = 20
+    max_line_gap = 20
 
     result = hough_lines(image, masked_edges, rho, theta, threshold, min_line_length, max_line_gap)
 
@@ -217,7 +300,7 @@ def process_image(image):
     color_edges = np.dstack((edges, edges, edges))
 
     α = 0.35
-    β = 1.
+    β = 0.8
     λ = 0.
     result = weighted_img(result, image, α, β, λ)
     # plt.imshow(result)
@@ -233,24 +316,20 @@ def process_image(image):
 #   You should make sure your pipeline works well on these images before you try the videos.
 #
 
-# import os
-# print(os.listdir("test_images/"))
 
-images = ['solidWhiteCurve.jpg', 'solidWhiteRight.jpg', 'solidYellowCurve.jpg', 'solidYellowCurve2.jpg',
-          'solidYellowLeft.jpg', 'whiteCarLaneSwitch.jpg']
+import os
 
-# process_image(images[1])
-
-# TODO: run your solution on all test_images and make copies into the test_images directory).
-
-for image_name in images:
+for image_name in os.listdir("test_images/"):
+    if image_name == '.DS_Store':
+    # if image_name == '.DS_Store' or image_name != 'solidWhiteCurve.jpg':
+    # if image_name == '.DS_Store' or image_name != 'solidYellowCurve.jpg':
+    # if image_name == '.DS_Store' or image_name != 'horzLineTest.jpg':
+        continue
     image = mpimg.imread('test_images/' + image_name)
     result = process_image(image)
     # plt.imshow(result)
     # plt.show()
-    mpimg.imsave("RENDERED_"+image_name, result)
-
-
+    mpimg.imsave("RENDERED_" + image_name, result)
 
 # Import everything needed to edit/save/watch video clips
 from moviepy.editor import VideoFileClip
