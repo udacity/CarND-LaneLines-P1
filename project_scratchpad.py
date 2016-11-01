@@ -181,11 +181,12 @@ def process_image(image):
     img_height = imshape[0]
     img_width = imshape[1]
 
+    # (W, H) == (x, y)
     vertices = np.array([
         [
             (bottom_offset, img_height),               # bottom left
-            (img_width * 0.45, img_height * 0.59),     # top left
-            (img_width * 0.55, img_height * 0.59),     # top right
+            (img_width * 0.48, img_height * 0.60),     # top left
+            (img_width * 0.54, img_height * 0.60),     # top right
             (img_width - bottom_offset, img_height)    # bottom right
         ]
     ], dtype=np.int32)
@@ -204,18 +205,18 @@ def process_image(image):
     # min_line_length = 10
     # max_line_gap = 1
 
-    rho = 2
-    theta = np.pi / 180
-    threshold = 15
-    min_line_length = 40
-    max_line_gap = 20
+    rho = 1
+    theta = np.pi / 230
+    threshold = 20
+    min_line_length = 25
+    max_line_gap = 40
 
     result = hough_lines(image, masked_edges, rho, theta, threshold, min_line_length, max_line_gap)
 
     # Create a "color" binary image to combine with line image
     color_edges = np.dstack((edges, edges, edges))
 
-    α = 0.8
+    α = 0.35
     β = 1.
     λ = 0.
     result = weighted_img(result, image, α, β, λ)
@@ -255,12 +256,12 @@ for image_name in images:
 from moviepy.editor import VideoFileClip
 from IPython.display import HTML
 
-white_output = 'white.mp4'
-clip1 = VideoFileClip("solidWhiteRight.mp4")
-white_clip = clip1.fl_image(process_image)
-white_clip.write_videofile(white_output, audio=False)
+# white_output = 'white.mp4'
+# clip1 = VideoFileClip("solidWhiteRight.mp4")
+# white_clip = clip1.fl_image(process_image)
+# white_clip.write_videofile(white_output, audio=False)
 
-yellow_output = 'yellow.mp4'
-clip2 = VideoFileClip('solidYellowLeft.mp4')
-yellow_clip = clip2.fl_image(process_image)
-yellow_clip.write_videofile(yellow_output, audio=False)
+# yellow_output = 'yellow.mp4'
+# clip2 = VideoFileClip('solidYellowLeft.mp4')
+# yellow_clip = clip2.fl_image(process_image)
+# yellow_clip.write_videofile(yellow_output, audio=False)
