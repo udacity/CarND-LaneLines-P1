@@ -115,46 +115,36 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=5):
                 # print('(side,x1,y1,x2,y2,angle) = (', 'L',',', x1, ',', y1, ',', x2, ',', y2, ',', angle, ')')
                 sides[0].append(tuple((x1, y1, x2, y2, angle)))
 
-                # cv2.line(img, (x1, y1), (x2, y2), color, thickness)
             elif 25 < angle <= 45:
                 # positive angle is right line
                 # print('(side,x1,y1,x2,y2,angle) = (', 'R', ',', x1, ',', y1, ',', x2, ',', y2, ',', angle, ')')
                 sides[1].append(tuple((x1, y1, x2, y2, angle)))
-                # cv2.line(img, (x1, y1), (x2, y2), color, thickness)
             else:
                 print('XXX (side,x1,y1,x2,y2,angle) = (', 'R', ',', x1, ',', y1, ',', x2, ',', y2, ',', angle, ')')
+
 
     # draw left line
     all_x1 = []
     all_y1 = []
     all_x2 = []
     all_y2 = []
+    all_slopes = []
 
     for x1, y1, x2, y2, angle in sides[0]:
         all_x1.append(x1)
         all_x2.append(x2)
         all_y1.append(y1)
         all_y2.append(y2)
+        all_slopes.append((y2 - y1) / (x2 - x1))
 
-    avg_x1 = sum(all_x1) / float(len(all_x1))
-    avg_y1 = sum(all_y1) / float(len(all_y1))
-    avg_x2 = sum(all_x2) / float(len(all_x2))
-    avg_y2 = sum(all_y2) / float(len(all_y2))
-    avg_slope = (avg_y2 - avg_y1) / (avg_x2 - avg_x1)
+    x1 = min(all_x1)
+    x2 = max(all_x2)
+    y1 = max(all_y1)
+    y2 = min(all_y2)
 
-    print("avg all x1: ", avg_x1)
-    print("avg all y1: ", avg_y1)
-    print("avg all x2: ", avg_x2)
-    print("avg all y2: ", avg_y2)
-    print("avg slope (m): ", avg_slope)
-
-    print("(min, max) x1: ", min(all_x1), max(all_x1))
-    print("(min, max) x2: ", min(all_x2), max(all_x2))
-    print("(min, max) y1: ", min(all_y1), max(all_y1))
-    print("(min, max) y2: ", min(all_y2), max(all_y2))
+    cv2.line(img, (x1, y1), (x2, y2), color, thickness)
 
 
-    cv2.line(img, (min(all_x1), max(all_y1)), (max(all_x2), min(all_y2)), color, thickness)
 
     # draw right line
     all_x1 = []
@@ -169,10 +159,6 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=5):
         all_y1.append(y1)
         all_y2.append(y2)
         all_slopes.append((y2-y1)/(x2-x1))
-
-    # cv2.line(img, (min(all_x1), min(all_y1)), (min(all_x2), max(all_y2)), color, thickness)
-    # cv2.line(img, (649, 420), (728, 469), color, thickness)
-    # cv2.line(img, (497, 326), (574, 372), color, thickness)
 
     x1 = min(all_x1)
     x2 = max(all_x2)
@@ -299,8 +285,8 @@ def process_image(image):
     # Create a "color" binary image to combine with line image
     color_edges = np.dstack((edges, edges, edges))
 
-    α = 0.35
-    β = 0.8
+    α = 0.8
+    β = 1.
     λ = 0.
     result = weighted_img(result, image, α, β, λ)
     # plt.imshow(result)
@@ -335,12 +321,12 @@ for image_name in os.listdir("test_images/"):
 from moviepy.editor import VideoFileClip
 from IPython.display import HTML
 
-# white_output = 'white.mp4'
-# clip1 = VideoFileClip("solidWhiteRight.mp4")
-# white_clip = clip1.fl_image(process_image)
-# white_clip.write_videofile(white_output, audio=False)
+white_output = 'white.mp4'
+clip1 = VideoFileClip("solidWhiteRight.mp4")
+white_clip = clip1.fl_image(process_image)
+white_clip.write_videofile(white_output, audio=False)
 
-# yellow_output = 'yellow.mp4'
-# clip2 = VideoFileClip('solidYellowLeft.mp4')
-# yellow_clip = clip2.fl_image(process_image)
-# yellow_clip.write_videofile(yellow_output, audio=False)
+yellow_output = 'yellow.mp4'
+clip2 = VideoFileClip('solidYellowLeft.mp4')
+yellow_clip = clip2.fl_image(process_image)
+yellow_clip.write_videofile(yellow_output, audio=False)
