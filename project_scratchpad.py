@@ -222,6 +222,9 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=15):
     this function with the weighted_img() function below
     """
 
+    if lines is None or len(lines) <= 0:
+        return
+
     left_lane_lines = []
     right_lane_lines = []
 
@@ -401,22 +404,22 @@ for image_name in os.listdir("test_images/"):
 # Import everything needed to edit/save/watch video clips
 from moviepy.editor import VideoFileClip
 
-white_output = 'white.mp4'
-clip1 = VideoFileClip("solidWhiteRight.mp4")
-white_clip = clip1.fl_image(process_image)
-white_clip.write_videofile(white_output, audio=False)
+# white_output = 'white.mp4'
+# clip1 = VideoFileClip("solidWhiteRight.mp4")
+# white_clip = clip1.fl_image(process_image)
+# white_clip.write_videofile(white_output, audio=False)
 
-yellow_output = 'yellow.mp4'
-clip2 = VideoFileClip('solidYellowLeft.mp4')
-yellow_clip = clip2.fl_image(process_image)
-yellow_clip.write_videofile(yellow_output, audio=False)
+# yellow_output = 'yellow.mp4'
+# clip2 = VideoFileClip('solidYellowLeft.mp4')
+# yellow_clip = clip2.fl_image(process_image)
+# yellow_clip.write_videofile(yellow_output, audio=False)
 
 # challenge_output = 'extra.mp4'
 # clip2 = VideoFileClip('challenge.mp4')
 # challenge_clip = clip2.fl_image(process_image)
 # challenge_clip.write_videofile(challenge_output, audio=False)
 
-# me_output = 'me.mp4'
-# clip2 = VideoFileClip('custom_me_night_1.mp4')
-# me_clip = clip2.fl_image(process_image)
-# me_clip.write_videofile(me_output, audio=False)
+me_output = 'me2.mp4'
+clip2 = VideoFileClip('custom_me_night_2.mp4')
+me_clip = clip2.fl_image(process_image)
+me_clip.write_videofile(me_output, audio=False)
