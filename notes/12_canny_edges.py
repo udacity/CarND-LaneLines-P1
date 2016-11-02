@@ -8,7 +8,7 @@ import cv2
 # Read in the image and convert to grayscale
 # Note: in the previous example we were reading a .jpg
 # Here we read a .png and convert to 0,255 bytescale
-image = (mpimg.imread('../test_images/exit_ramp.png') * 255).astype('uint8')
+image = (mpimg.imread('exit_ramp.png') * 255).astype('uint8')
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 plt.imshow(gray, cmap='gray')

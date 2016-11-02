@@ -10,7 +10,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-image = mpimg.imread('../test_images/exit-ramp.png')
+image = mpimg.imread('exit-ramp.png')
 plt.imshow(image)
 
 # show it before

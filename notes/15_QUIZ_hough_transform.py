@@ -7,7 +7,7 @@ from helpers import select_region
 # Read in and grayscale the image
 # Note: in the previous example we were reading a .jpg
 # Here we read a .png and convert to 0,255 bytescale
-image = (mpimg.imread('../test_images/exit_ramp.png') * 255).astype('uint8')
+image = (mpimg.imread('exit_ramp.png') * 255).astype('uint8')
 
 print('image type: ', type(image), 'dimensions: ', image.shape)
 
