@@ -93,20 +93,36 @@ r_prev_x1 = r_prev_y1 = r_prev_y2 = r_prev_x2 = r_abs_min_y = None
 def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
     global l_prev_x1, l_prev_y1, l_prev_y2, l_prev_x2, l_abs_min_y
 
+    print('left line count: ', len(lines))
+
     abs_max_y = img.shape[0]
 
+    all_x1 = []
+    all_y1 = []
+    all_x2 = []
     all_y2 = []
     left_slopes = []
     left_intercepts = []
 
     for x1, y1, x2, y2, angle, m, b in lines:
+        all_x1.append(x1)
+        all_y1.append(y1)
+        all_x2.append(x2)
         all_y2.append(y2)
         left_slopes.append(m)
         left_intercepts.append(b)
 
+    avg_x1 = sum(all_x1) / len(all_x1)
+    avg_y1 = sum(all_y1) / len(all_y1)
+    avg_x2 = sum(all_x2) / len(all_x2)
+    avg_y2 = sum(all_y2) / len(all_y2)
+
     # Find the average of all slopes and y-intercepts to essentially center the final line along the lane line
     m = sum(left_slopes) / len(left_slopes)
     b = sum(left_intercepts) / len(left_intercepts)
+
+    # m = (avg_y2 - avg_y1) / (avg_x2 - avg_x1)
+    # b = avg_y1 - m * avg_x1
 
     # Smooth out our y2 by remembering the smallest y2.
     # doesn't work well on curves at which point I would switch to a
@@ -117,6 +133,7 @@ def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
     l_abs_min_y = y2
 
     y1 = abs_max_y
+    # y1 = max(all_y1)
     x1 = int((y1 - b) / m)
     x2 = int((y2 - b) / m)
 
@@ -226,8 +243,8 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=15):
     if lines is None or len(lines) <= 0:
         return
 
-    left_lane_lines = []
-    right_lane_lines = []
+    left_lines = []
+    right_lines = []
 
     # This iteration splits each line into their respective line side bucket.
     # Negative line angles are left lane lines
@@ -244,24 +261,23 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=15):
             b = y1 - m * x1
 
             # left lane line
-            if -40 < angle <= -30:
-                print('left (x1, y1, x2, y2, angle, m, b) ', x1, y1, x2, y2, angle, m, b)
-                left_lane_lines.append(tuple((x1, y1, x2, y2, angle, m, b)))
+            if -45 < angle <= -20:
+                left_lines.append(tuple((x1, y1, x2, y2, angle, m, b)))
 
             # right lane line
-            elif 28 <= angle <= 45:
-                right_lane_lines.append(tuple((x1, y1, x2, y2, angle, m, b)))
+            elif 20 <= angle <= 45:
+                right_lines.append(tuple((x1, y1, x2, y2, angle, m, b)))
             else:
-                if len(right_lane_lines) > 0:
-                    right_lane_lines.append(right_lane_lines[len(right_lane_lines) - 1])
-                if len(left_lane_lines) > 0:
-                    left_lane_lines.append(left_lane_lines[len(left_lane_lines) - 1])
+                if len(right_lines) > 0:
+                    right_lines.append(right_lines[len(right_lines) - 1])
+                if len(left_lines) > 0:
+                    left_lines.append(left_lines[len(left_lines) - 1])
 
-    if len(left_lane_lines) > 0:
-        draw_left_line(img, left_lane_lines, color, thickness)
+    if len(left_lines) > 0:
+        draw_left_line(img, left_lines, color, thickness)
 
-    if len(right_lane_lines) > 0:
-        draw_right_line(img, right_lane_lines, color, thickness)
+    if len(right_lines) > 0:
+        draw_right_line(img, right_lines, color, thickness)
 
 
 def hough_lines(orig_img, img, rho, theta, threshold, min_line_len, max_line_gap):
@@ -336,8 +352,6 @@ def process_image(image):
             (img_width - bottom_offset, img_height)  # bottom right
         ]
     ], dtype=np.int32)
-
-    # print('region of interest vertices: ', vertices)
 
     masked_edges = region_of_interest(edges, vertices)
 
