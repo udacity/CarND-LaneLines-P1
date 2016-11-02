@@ -86,7 +86,125 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
+alp = 0.1
+l_prev_x1 = l_prev_y1 = l_prev_y2 = l_prev_x2 = l_abs_min_y = None
+r_prev_x1 = r_prev_y1 = r_prev_y2 = r_prev_x2 = r_abs_min_y = None
+
+
+def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
+    global l_prev_x1, l_prev_y1, l_prev_y2, l_prev_x2, l_abs_min_y
+
+    abs_max_y = img.shape[0]
+
+    # draw left line
+    all_x1 = []
+    all_y1 = []
+    left_y2 = []
+    left_slopes = []
+    left_intercepts = []
+
+    for x1, y1, x2, y2, angle, m, b in lines:
+        all_x1.append(x1)
+        all_y1.append(y1)
+        left_y2.append(y2)
+        left_slopes.append(m)
+        left_intercepts.append(b)
+
+    # Find the average of all slopes and y-intercepts to essentially center the final line along the lane line
+    m = sum(left_slopes) / len(left_slopes)
+    b = sum(left_intercepts) / len(left_intercepts)
+
+    # Smooth out our y2 by remembering the smallest y2
+    # doesn't work well on curves at which point I would switch to a
+    # different algorithm for curve analysis
+    if l_abs_min_y is None:
+        l_abs_min_y = min(left_y2)
+    y2 = min(l_abs_min_y, min(left_y2))
+    l_abs_min_y = y2
+
+    # x1 = int((abs_max_y - b) / m)
+    # x1 = min(all_x1)
+    y1 = abs_max_y
+    x1 = int((y1 - b) / m)
+    x2 = int((y2 - b) / m)
+
+    # Smooth out the line
+    if l_prev_y1 is not None:
+        y1 = int(l_prev_y1 * (1 - alp) + y1 * alp)
+
+    if l_prev_y2 is not None:
+        y2 = int(l_prev_y2 * (1 - alp) + y2 * alp)
+
+    if l_prev_x1 is not None:
+        x1 = int(l_prev_x1 * (1 - alp) + x1 * alp)
+
+    if l_prev_x2 is not None:
+        x2 = int(l_prev_x2 * (1 - alp) + x2 * alp)
+
+    cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+
+    # keep our globals updated
+    l_prev_y1 = y1
+    l_prev_y2 = y2
+    l_prev_x1 = x1
+    l_prev_x2 = x2
+
+
+def draw_right_line(img, lines, color=[255, 0, 0], thickness=15):
+    global r_prev_x1, r_prev_y1, r_prev_y2, r_prev_x2, r_abs_min_y
+
+    abs_max_y = img.shape[0]
+
+    # draw left line
+    all_y1 = []
+    slopes = []
+    intercepts = []
+
+    for x1, y1, x2, y2, angle, m, b in lines:
+        all_y1.append(y1)
+        slopes.append(m)
+        intercepts.append(b)
+
+    # Find the average of all slopes and y-intercepts to essentially center the final line along the lane line
+    m = sum(slopes) / len(slopes)
+    b = sum(intercepts) / len(intercepts)
+
+    # Smooth out our y1 by remembering the smallest y1
+    # doesn't work well on curves at which point I would switch to a
+    # different algorithm for curve analysis
+
+    if r_abs_min_y is None:
+        r_abs_min_y = min(all_y1)
+    y1 = min(r_abs_min_y, min(all_y1))
+    r_abs_min_y = y1
+
+    x1 = int((r_abs_min_y - b) / m)
+    y2 = abs_max_y
+    x2 = int((y2 - b) / m)
+
+    # Smooth out the line
+    if r_prev_y1 is not None:
+        y1 = int(r_prev_y1 * (1 - alp) + y1 * alp)
+
+    if r_prev_y2 is not None:
+        y2 = int(r_prev_y2 * (1 - alp) + y2 * alp)
+
+    if r_prev_x1 is not None:
+        x1 = int(r_prev_x1 * (1 - alp) + x1 * alp)
+
+    if r_prev_x2 is not None:
+        x2 = int(r_prev_x2 * (1 - alp) + x2 * alp)
+
+    cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+
+    # keep our globals updated
+    r_prev_y1 = y1
+    r_prev_y2 = y2
+    r_prev_x1 = x1
+    r_prev_x2 = x2
+
+
+def draw_lines(img, lines, color=[255, 0, 0], thickness=15):
     """
     NOTE: this is the function you might want to use as a starting point once you want to
     average/extrapolate the line segments you detect to map out the full
@@ -104,102 +222,42 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=10):
     this function with the weighted_img() function below
     """
 
-    sides = [[], []]
+    left_lane_lines = []
+    right_lane_lines = []
 
-    all_x1 = []
-    all_y1 = []
-    all_x2 = []
-    all_y2 = []
-    all_slopes = []
-
+    # This iteration splits each line into their respective line side bucket.
+    # Negative line angles are left lane lines
+    # Positive line angles are right lane lines
+    # We also filter out outlier lines such as horizontal lines by specifying a
+    # range of acceptable angles. There is definitely a better way but I feel
+    # this is accurate enough for first pass.
     for line in lines:
         for x1, y1, x2, y2 in line:
-            all_x1.append(x1)
-            all_x2.append(x2)
-            all_y1.append(y1)
-            all_y2.append(y2)
-            all_slopes.append((y2 - y1) / (x2 - x1))
 
-            # ignore horizontal lines below a certain angle
+            # compute the angle of the line
             angle = math.atan2(y2 - y1, x2 - x1) * 180.0 / np.pi
-            if -45 < angle <= -30:
-                # negative angle is left line
-                # print('(side,x1,y1,x2,y2,angle) = (', 'L',',', x1, ',', y1, ',', x2, ',', y2, ',', angle, ')')
-                sides[0].append(tuple((x1, y1, x2, y2, angle)))
+            m = (y2 - y1) / (x2 - x1)
+            b = y1 - m * x1
 
-            elif 25 < angle <= 45:
-                # positive angle is right line
-                # print('(side,x1,y1,x2,y2,angle) = (', 'R', ',', x1, ',', y1, ',', x2, ',', y2, ',', angle, ')')
-                sides[1].append(tuple((x1, y1, x2, y2, angle)))
+            # left lane line
+            if -40 < angle <= -30:
+                print('left (x1, y1, x2, y2, angle, m, b) ', x1, y1, x2, y2, angle, m, b)
+                left_lane_lines.append(tuple((x1, y1, x2, y2, angle, m, b)))
+
+            # right lane line
+            elif 28 <= angle <= 45:
+                right_lane_lines.append(tuple((x1, y1, x2, y2, angle, m, b)))
             else:
-                print('XXX (side,x1,y1,x2,y2,angle) = (', 'R', ',', x1, ',', y1, ',', x2, ',', y2, ',', angle, ')')
+                if len(right_lane_lines) > 0:
+                    right_lane_lines.append(right_lane_lines[len(right_lane_lines) - 1])
+                if len(left_lane_lines) > 0:
+                    left_lane_lines.append(left_lane_lines[len(left_lane_lines) - 1])
 
+    if len(left_lane_lines) > 0:
+        draw_left_line(img, left_lane_lines, color, thickness)
 
-    # draw left line
-    left_x1 = []
-    left_y1 = []
-    left_x2 = []
-    left_y2 = []
-    left_slopes = []
-
-    for x1, y1, x2, y2, angle in sides[0]:
-        left_x1.append(x1)
-        left_x2.append(x2)
-        left_y1.append(y1)
-        left_y2.append(y2)
-        left_slopes.append((y2 - y1) / (x2 - x1))
-
-    x1 = min(left_x1)
-    x2 = max(left_x2)
-    y1 = max(left_y1)
-    y2 = min(left_y2)
-
-    m = (y2-y1)/(x2-x1)
-    # m = sum(left_slopes) / len(left_slopes)
-    b = y1-m*x1
-
-    min_y1 = int(img.shape[0])
-    min_x1 = int((min_y1-b)/m)
-    y2 = min(left_y2)
-    max_x2 = int((y2 - b) / m)
-
-    y2 = min(left_y1+left_y2)
-    print('left min y', y2)
-
-    # cv2.line(img, (x1, y1), (x2, y2), color, thickness)
-    cv2.line(img, (min_x1, min_y1), (max_x2, y2), color, thickness)
-
-
-    # draw right line
-    right_x1 = []
-    right_y1 = []
-    right_x2 = []
-    right_y2 = []
-    right_slopes = []
-
-    for x1, y1, x2, y2, angle in sides[1]:
-        right_x1.append(x1)
-        right_x2.append(x2)
-        right_y1.append(y1)
-        right_y2.append(y2)
-        right_slopes.append((y2-y1)/(x2-x1))
-
-    x1 = min(right_x1)
-    x2 = max(right_x2)
-    y1 = min(right_y1)
-    y2 = max(right_y2)
-
-    m = (y2-y1)/(x2-x1)
-    # m = sum(right_slopes)/len(right_slopes)
-    b = y1-m*x1
-
-    y1 = min(right_y1)
-    x1 = int((y1-b)/m)
-    y2 = int(img.shape[0])
-    x2 = int((y2-b)/m)
-
-    cv2.line(img, (x1, y1), (x2, y2), color, thickness)
-
+    if len(right_lane_lines) > 0:
+        draw_right_line(img, right_lane_lines, color, thickness)
 
 
 def hough_lines(orig_img, img, rho, theta, threshold, min_line_len, max_line_gap):
@@ -302,7 +360,7 @@ def process_image(image):
     theta = np.pi / 180
     threshold = 40
     min_line_length = 20
-    max_line_gap = 20
+    max_line_gap = 50
 
     result = hough_lines(image, masked_edges, rho, theta, threshold, min_line_length, max_line_gap)
 
@@ -313,8 +371,6 @@ def process_image(image):
     β = 1.
     λ = 0.
     result = weighted_img(result, image, α, β, λ)
-    # plt.imshow(result)
-    # plt.show()
 
     return result
 
@@ -331,32 +387,31 @@ import os
 
 for image_name in os.listdir("test_images/"):
     if image_name == '.DS_Store':
-    # if image_name == '.DS_Store' or image_name != 'solidWhiteCurve.jpg':
-    # if image_name == '.DS_Store' or image_name != 'solidYellowCurve.jpg':
-    # if image_name == '.DS_Store' or image_name != 'horzLineTest.jpg':
+        # if image_name == '.DS_Store' or image_name != 'whiteCarLaneSwitch.jpg':
+        # if image_name == '.DS_Store' or image_name != 'solidWhiteCurve.jpg':
+        # if image_name == '.DS_Store' or image_name != 'solidYellowCurve.jpg':
+        # if image_name == '.DS_Store' or image_name != 'solidYellowCurve2.jpg':
+        # if image_name == '.DS_Store' or image_name != 'horzLineTest.jpg':
         continue
     image = mpimg.imread('test_images/' + image_name)
     result = process_image(image)
-    # plt.imshow(result)
-    # plt.show()
     mpimg.imsave("RENDERED_" + image_name, result)
 
 # Import everything needed to edit/save/watch video clips
 from moviepy.editor import VideoFileClip
 from IPython.display import HTML
 
-# white_output = 'white.mp4'
-# clip1 = VideoFileClip("solidWhiteRight.mp4")
-# white_clip = clip1.fl_image(process_image)
-# white_clip.write_videofile(white_output, audio=False)
+white_output = 'white.mp4'
+clip1 = VideoFileClip("solidWhiteRight.mp4")
+white_clip = clip1.fl_image(process_image)
+white_clip.write_videofile(white_output, audio=False)
 
-# yellow_output = 'yellow.mp4'
-# clip2 = VideoFileClip('solidYellowLeft.mp4')
-# yellow_clip = clip2.fl_image(process_image)
-# yellow_clip.write_videofile(yellow_output, audio=False)
+yellow_output = 'yellow.mp4'
+clip2 = VideoFileClip('solidYellowLeft.mp4')
+yellow_clip = clip2.fl_image(process_image)
+yellow_clip.write_videofile(yellow_output, audio=False)
 
-
-# challenge_output = 'extra.mp4'
-# clip2 = VideoFileClip('challenge.mp4')
-# challenge_clip = clip2.fl_image(process_image)
-# challenge_clip.write_videofile(challenge_output, audio=False)
+challenge_output = 'extra.mp4'
+clip2 = VideoFileClip('challenge.mp4')
+challenge_clip = clip2.fl_image(process_image)
+challenge_clip.write_videofile(challenge_output, audio=False)
