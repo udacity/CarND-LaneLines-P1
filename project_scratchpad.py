@@ -86,7 +86,6 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-alp = 0.1
 l_prev_x1 = l_prev_y1 = l_prev_y2 = l_prev_x2 = l_abs_min_y = None
 r_prev_x1 = r_prev_y1 = r_prev_y2 = r_prev_x2 = r_abs_min_y = None
 
@@ -96,17 +95,12 @@ def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
 
     abs_max_y = img.shape[0]
 
-    # draw left line
-    all_x1 = []
-    all_y1 = []
-    left_y2 = []
+    all_y2 = []
     left_slopes = []
     left_intercepts = []
 
     for x1, y1, x2, y2, angle, m, b in lines:
-        all_x1.append(x1)
-        all_y1.append(y1)
-        left_y2.append(y2)
+        all_y2.append(y2)
         left_slopes.append(m)
         left_intercepts.append(b)
 
@@ -114,19 +108,22 @@ def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
     m = sum(left_slopes) / len(left_slopes)
     b = sum(left_intercepts) / len(left_intercepts)
 
-    # Smooth out our y2 by remembering the smallest y2
+    # Smooth out our y2 by remembering the smallest y2.
     # doesn't work well on curves at which point I would switch to a
     # different algorithm for curve analysis
     if l_abs_min_y is None:
-        l_abs_min_y = min(left_y2)
-    y2 = min(l_abs_min_y, min(left_y2))
+        l_abs_min_y = min(all_y2)
+    y2 = min(l_abs_min_y, min(all_y2))
     l_abs_min_y = y2
 
-    # x1 = int((abs_max_y - b) / m)
-    # x1 = min(all_x1)
     y1 = abs_max_y
     x1 = int((y1 - b) / m)
     x2 = int((y2 - b) / m)
+
+    if l_prev_y1 is None:
+        alp = 1
+    else:
+        alp = 0.1
 
     # Smooth out the line
     if l_prev_y1 is not None:
@@ -155,7 +152,6 @@ def draw_right_line(img, lines, color=[255, 0, 0], thickness=15):
 
     abs_max_y = img.shape[0]
 
-    # draw left line
     all_y1 = []
     slopes = []
     intercepts = []
@@ -181,6 +177,11 @@ def draw_right_line(img, lines, color=[255, 0, 0], thickness=15):
     x1 = int((r_abs_min_y - b) / m)
     y2 = abs_max_y
     x2 = int((y2 - b) / m)
+
+    if r_prev_y1 is None:
+        alp = 1
+    else:
+        alp = 0.1
 
     # Smooth out the line
     if r_prev_y1 is not None:
@@ -395,22 +396,22 @@ for image_name in os.listdir("test_images/"):
 # Import everything needed to edit/save/watch video clips
 from moviepy.editor import VideoFileClip
 
-# white_output = 'white.mp4'
-# clip1 = VideoFileClip("solidWhiteRight.mp4")
-# white_clip = clip1.fl_image(process_image)
-# white_clip.write_videofile(white_output, audio=False)
+white_output = 'white.mp4'
+clip1 = VideoFileClip("solidWhiteRight.mp4")
+white_clip = clip1.fl_image(process_image)
+white_clip.write_videofile(white_output, audio=False)
 
-# yellow_output = 'yellow.mp4'
-# clip2 = VideoFileClip('solidYellowLeft.mp4')
-# yellow_clip = clip2.fl_image(process_image)
-# yellow_clip.write_videofile(yellow_output, audio=False)
+yellow_output = 'yellow.mp4'
+clip2 = VideoFileClip('solidYellowLeft.mp4')
+yellow_clip = clip2.fl_image(process_image)
+yellow_clip.write_videofile(yellow_output, audio=False)
 
 # challenge_output = 'extra.mp4'
 # clip2 = VideoFileClip('challenge.mp4')
 # challenge_clip = clip2.fl_image(process_image)
 # challenge_clip.write_videofile(challenge_output, audio=False)
 
-me_output = 'me2.mp4'
-clip2 = VideoFileClip('custom_me_night_2.mp4')
-me_clip = clip2.fl_image(process_image)
-me_clip.write_videofile(me_output, audio=False)
+# me_output = 'me2.mp4'
+# clip2 = VideoFileClip('custom_me_night_2.mp4')
+# me_clip = clip2.fl_image(process_image)
+# me_clip.write_videofile(me_output, audio=False)
