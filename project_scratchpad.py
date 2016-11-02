@@ -298,15 +298,6 @@ def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
 #   START
 
 def process_image(image):
-    # printing out some stats and plotting
-    # print('This image is:', type(image))
-    # print('with dimesions:', image.shape)
-    # print('width: ', image.shape[1])
-    # print('height: ', image.shape[0])
-
-    # plt.imshow(image)
-    # plt.show()
-
     # call as plt.imshow(gray, cmap='gray') to show a grayscaled image
     gray = grayscale(image)
     # plt.imshow(gray, cmap='gray')
