@@ -137,23 +137,20 @@ def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
     x1 = int((y1 - b) / m)
     x2 = int((y2 - b) / m)
 
-    if l_prev_y1 is None:
-        alp = 1
-    else:
-        alp = 0.1
+    α = 0.1
 
     # Smooth out the line
     if l_prev_y1 is not None:
-        y1 = int(l_prev_y1 * (1 - alp) + y1 * alp)
+        y1 = int(l_prev_y1 * (1 - α) + y1 * α)
 
     if l_prev_y2 is not None:
-        y2 = int(l_prev_y2 * (1 - alp) + y2 * alp)
+        y2 = int(l_prev_y2 * (1 - α) + y2 * α)
 
     if l_prev_x1 is not None:
-        x1 = int(l_prev_x1 * (1 - alp) + x1 * alp)
+        x1 = int(l_prev_x1 * (1 - α) + x1 * α)
 
     if l_prev_x2 is not None:
-        x2 = int(l_prev_x2 * (1 - alp) + x2 * alp)
+        x2 = int(l_prev_x2 * (1 - α) + x2 * α)
 
     cv2.line(img, (x1, y1), (x2, y2), color, thickness)
 
@@ -195,23 +192,20 @@ def draw_right_line(img, lines, color=[255, 0, 0], thickness=15):
     y2 = abs_max_y
     x2 = int((y2 - b) / m)
 
-    if r_prev_y1 is None:
-        alp = 1
-    else:
-        alp = 0.1
+    α = 0.1
 
     # Smooth out the line
     if r_prev_y1 is not None:
-        y1 = int(r_prev_y1 * (1 - alp) + y1 * alp)
+        y1 = int(r_prev_y1 * (1 - α) + y1 * α)
 
     if r_prev_y2 is not None:
-        y2 = int(r_prev_y2 * (1 - alp) + y2 * alp)
+        y2 = int(r_prev_y2 * (1 - α) + y2 * α)
 
     if r_prev_x1 is not None:
-        x1 = int(r_prev_x1 * (1 - alp) + x1 * alp)
+        x1 = int(r_prev_x1 * (1 - α) + x1 * α)
 
     if r_prev_x2 is not None:
-        x2 = int(r_prev_x2 * (1 - alp) + x2 * alp)
+        x2 = int(r_prev_x2 * (1 - α) + x2 * α)
 
     cv2.line(img, (x1, y1), (x2, y2), color, thickness)
 
