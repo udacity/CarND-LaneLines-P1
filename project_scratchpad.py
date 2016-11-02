@@ -387,19 +387,19 @@ import os
 
 for image_name in os.listdir("test_images/"):
     if image_name == '.DS_Store':
-        # if image_name == '.DS_Store' or image_name != 'whiteCarLaneSwitch.jpg':
-        # if image_name == '.DS_Store' or image_name != 'solidWhiteCurve.jpg':
-        # if image_name == '.DS_Store' or image_name != 'solidYellowCurve.jpg':
-        # if image_name == '.DS_Store' or image_name != 'solidYellowCurve2.jpg':
-        # if image_name == '.DS_Store' or image_name != 'horzLineTest.jpg':
+    # if image_name == '.DS_Store' or image_name != 'whiteCarLaneSwitch.jpg':
+    # if image_name == '.DS_Store' or image_name != 'solidWhiteCurve.jpg':
+    # if image_name == '.DS_Store' or image_name != 'solidYellowCurve.jpg':
+    # if image_name == '.DS_Store' or image_name != 'solidYellowCurve2.jpg':
+    # if image_name == '.DS_Store' or image_name != 'horzLineTest.jpg':
         continue
     image = mpimg.imread('test_images/' + image_name)
     result = process_image(image)
     mpimg.imsave("RENDERED_" + image_name, result)
 
+
 # Import everything needed to edit/save/watch video clips
 from moviepy.editor import VideoFileClip
-from IPython.display import HTML
 
 white_output = 'white.mp4'
 clip1 = VideoFileClip("solidWhiteRight.mp4")
@@ -411,7 +411,12 @@ clip2 = VideoFileClip('solidYellowLeft.mp4')
 yellow_clip = clip2.fl_image(process_image)
 yellow_clip.write_videofile(yellow_output, audio=False)
 
-challenge_output = 'extra.mp4'
-clip2 = VideoFileClip('challenge.mp4')
-challenge_clip = clip2.fl_image(process_image)
-challenge_clip.write_videofile(challenge_output, audio=False)
+# challenge_output = 'extra.mp4'
+# clip2 = VideoFileClip('challenge.mp4')
+# challenge_clip = clip2.fl_image(process_image)
+# challenge_clip.write_videofile(challenge_output, audio=False)
+
+# me_output = 'me.mp4'
+# clip2 = VideoFileClip('custom_me_night_1.mp4')
+# me_clip = clip2.fl_image(process_image)
+# me_clip.write_videofile(me_output, audio=False)
