@@ -43,6 +43,15 @@ import cv2
 import math
 
 
+def hsv(img):
+    """Converts colorspace from RGB to HSV
+    This will return an image with HSV color space
+    but NOTE: to see the returned image as HSV
+    you should call plt.imshow(hsv)"""
+    return cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+    # return cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+
 def grayscale(img):
     """Applies the Grayscale transform
     This will return an image with only one color channel
@@ -90,13 +99,7 @@ l_prev_x1 = l_prev_y1 = l_prev_y2 = l_prev_x2 = l_abs_min_y = None
 r_prev_x1 = r_prev_y1 = r_prev_y2 = r_prev_x2 = r_abs_min_y = None
 
 
-def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
-    global l_prev_x1, l_prev_y1, l_prev_y2, l_prev_x2, l_abs_min_y
-
-    print('left line count: ', len(lines))
-
-    abs_max_y = img.shape[0]
-
+def find_least_squares_line(lines):
     all_x1 = []
     all_y1 = []
     all_x2 = []
@@ -112,14 +115,42 @@ def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
         left_slopes.append(m)
         left_intercepts.append(b)
 
-    avg_x1 = sum(all_x1) / len(all_x1)
-    avg_y1 = sum(all_y1) / len(all_y1)
-    avg_x2 = sum(all_x2) / len(all_x2)
-    avg_y2 = sum(all_y2) / len(all_y2)
+    all_x = (all_x1 + all_x2)
+    all_y = (all_y1 + all_y2)
+    mean_x = sum(all_x) / len(all_x)
+    mean_y = sum(all_y) / len(all_y)
+
+    m = sum([(xi - mean_x) * (yi - mean_y) for xi, yi in zip(all_x, all_y)]) / sum(
+        [(xi - mean_x) ** 2 for xi in zip(all_x)])
+    b = mean_y - m * mean_x
+
+    return m, b
+
+
+def draw_left_line(img, lines, color=[255, 0, 0], thickness=5):
+    global l_prev_x1, l_prev_y1, l_prev_y2, l_prev_x2, l_abs_min_y
+
+    # abs_max_y = img.shape[0]
+    abs_max_y = curr_pipeline_context.vertices[0][0][1]
+
+    all_y2 = []
+    left_slopes = []
+    left_intercepts = []
+
+    for x1, y1, x2, y2, angle, m, b in lines:
+        all_y2.append(y2)
+        left_slopes.append(m)
+        left_intercepts.append(b)
 
     # Find the average of all slopes and y-intercepts to essentially center the final line along the lane line
     m = sum(left_slopes) / len(left_slopes)
     b = sum(left_intercepts) / len(left_intercepts)
+
+    # m, b = find_least_squares_line(lines)
+
+    # print('least squares line: y = ', m, '*x', '+', b)
+    # print('left line count: ', len(lines))
+    # print('my least squares line: y = ', m, '*x', '+', b)
 
     # m = (avg_y2 - avg_y1) / (avg_x2 - avg_x1)
     # b = avg_y1 - m * avg_x1
@@ -133,11 +164,10 @@ def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
     l_abs_min_y = y2
 
     y1 = abs_max_y
-    # y1 = max(all_y1)
     x1 = int((y1 - b) / m)
     x2 = int((y2 - b) / m)
 
-    α = 0.1
+    α = 0.2
 
     # Smooth out the line
     if l_prev_y1 is not None:
@@ -161,10 +191,11 @@ def draw_left_line(img, lines, color=[255, 0, 0], thickness=15):
     l_prev_x2 = x2
 
 
-def draw_right_line(img, lines, color=[255, 0, 0], thickness=15):
+def draw_right_line(img, lines, color=[255, 0, 0], thickness=5):
     global r_prev_x1, r_prev_y1, r_prev_y2, r_prev_x2, r_abs_min_y
 
-    abs_max_y = img.shape[0]
+    # abs_max_y = img.shape[0]
+    abs_max_y = curr_pipeline_context.vertices[0][3][1]
 
     all_y1 = []
     slopes = []
@@ -178,6 +209,8 @@ def draw_right_line(img, lines, color=[255, 0, 0], thickness=15):
     # Find the average of all slopes and y-intercepts to essentially center the final line along the lane line
     m = sum(slopes) / len(slopes)
     b = sum(intercepts) / len(intercepts)
+
+    # m, b = find_least_squares_line(lines)
 
     # Smooth out our y1 by remembering the smallest y1
     # doesn't work well on curves at which point I would switch to a
@@ -216,7 +249,7 @@ def draw_right_line(img, lines, color=[255, 0, 0], thickness=15):
     r_prev_x2 = x2
 
 
-def draw_lines(img, lines, color=[255, 0, 0], thickness=15):
+def draw_lines(img, lines, color=[255, 0, 0], thickness=8):
     """
     NOTE: this is the function you might want to use as a starting point once you want to
     average/extrapolate the line segments you detect to map out the full
@@ -235,6 +268,7 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=15):
     """
 
     if lines is None or len(lines) <= 0:
+        print('ERROR: frame ', curr_frame, ' has no lines detected.')
         return
 
     left_lines = []
@@ -244,34 +278,43 @@ def draw_lines(img, lines, color=[255, 0, 0], thickness=15):
     # Negative line angles are left lane lines
     # Positive line angles are right lane lines
     # We also filter out outlier lines such as horizontal lines by specifying a
-    # range of acceptable angles. There is definitely a better way but I feel
+    # range of acceptable angles. There is likely a better way but I feel
     # this is accurate enough for first pass.
     for line in lines:
         for x1, y1, x2, y2 in line:
 
+            # An offset may be specified to compensate for pixels that are made up by
+            # erroneous data such as a hood or dashboard reflection
+
             # compute the angle of the line
             angle = math.atan2(y2 - y1, x2 - x1) * 180.0 / np.pi
-            m = (y2 - y1) / (x2 - x1)
-            b = y1 - m * x1
 
-            # left lane line
-            if -45 < angle <= -20:
-                left_lines.append(tuple((x1, y1, x2, y2, angle, m, b)))
+            if angle is not 0.:
+                m = (y2 - y1) / (x2 - x1)
+                b = y1 - m * x1
 
-            # right lane line
-            elif 20 <= angle <= 45:
-                right_lines.append(tuple((x1, y1, x2, y2, angle, m, b)))
-            else:
-                if len(right_lines) > 0:
-                    right_lines.append(right_lines[len(right_lines) - 1])
-                if len(left_lines) > 0:
-                    left_lines.append(left_lines[len(left_lines) - 1])
+                line_tuple = tuple((x1, y1, x2, y2, angle, m, b))
+
+                # left lane line
+                if -60 < angle <= -25:
+                    left_lines.append(line_tuple)
+
+                # right lane line
+                elif 20 <= angle <= 45:
+                    right_lines.append(line_tuple)
+
+                # else:
+                    # print('OOB line detected in frame ', curr_frame, ': ', line_tuple)
 
     if len(left_lines) > 0:
         draw_left_line(img, left_lines, color, thickness)
+    else:
+        print('ERROR: frame ', curr_frame, ' has no LEFT lines detected.')
 
     if len(right_lines) > 0:
         draw_right_line(img, right_lines, color, thickness)
+    else:
+        print('ERROR: frame ', curr_frame, ' has no RIGHT lines detected.')
 
 
 def hough_lines(orig_img, img, rho, theta, threshold, min_line_len, max_line_gap):
@@ -284,6 +327,8 @@ def hough_lines(orig_img, img, rho, theta, threshold, min_line_len, max_line_gap
                             maxLineGap=max_line_gap)
     # line_img = np.zeros(img.shape, dtype=np.uint8)
     line_img = np.copy(orig_img) * 0  # creating a blank to draw lines on
+
+    # mpimg.imsave("hough", line_img)
 
     draw_lines(line_img, lines)
     return line_img
@@ -308,20 +353,87 @@ def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
 
 #   START
 
-def process_image(image):
-    # call as plt.imshow(gray, cmap='gray') to show a grayscaled image
-    gray = grayscale(image)
-    # plt.imshow(gray, cmap='gray')
-    # plt.show()
+curr_frame = 0
+curr_pipeline_context = None
 
-    # Define a kernel size for Gaussian smoothing / blurring
-    kernel_size = 5  # Must be an odd number (3, 5, 7...)
-    blur_gray = gaussian_noise(gray, kernel_size)
 
-    # Define our parameters for Canny and run it
-    low_threshold = 50
-    high_threshold = 150
-    edges = canny(blur_gray, low_threshold, high_threshold)
+class HoughTransformPipeline:
+    def __init__(self, rho=2, theta=np.pi / 180, threshold=40, min_line_length=15, max_line_gap=80):
+        self.rho = rho
+        self.theta = theta
+        self.threshold = threshold
+        self.min_line_length = min_line_length
+        self.max_line_gap = max_line_gap
+
+
+class PipelineContext:
+    def __init__(self, gaussian_kernel_size=5, canny_low_threshold=50, canny_high_threshold=150,
+                 region_bottom_offset=55, region_vertice_weights=np.array([(1, 1), (0.48, 0.60), (0.54, 0.60), (1, 1)]),
+                 hough_transform_pipeline=HoughTransformPipeline()):
+        self.gaussian_kernel_size = gaussian_kernel_size
+        self.canny_low_threshold = canny_low_threshold
+        self.canny_high_threshold = canny_high_threshold
+        self.region_bottom_offset = region_bottom_offset
+        self.region_vertice_weights = region_vertice_weights
+        self.hough_transform_pipeline = hough_transform_pipeline
+        self.vertices = None
+
+
+def process_image(image, cvt_hsv=False):
+    global curr_frame, curr_pipeline_context
+
+    curr_frame += 1
+
+    if cvt_hsv == True:
+        hsv_img = hsv(image)
+
+        if curr_frame == 1:
+            mpimg.imsave("1_hsv_1_" + str(curr_frame), hsv_img)
+
+        # Define a kernel size for Gaussian smoothing / blurring
+        kernel_size = curr_pipeline_context.gaussian_kernel_size  # Must be an odd number (3, 5, 7...)
+        blur_hsv = gaussian_noise(hsv_img, kernel_size)
+
+        if curr_frame == 1:
+            mpimg.imsave("1_hsv_blur_" + str(curr_frame), blur_hsv)
+
+        WHITE_MIN = np.array([50, 50, 50], np.uint8)
+        WHITE_MAX = np.array([150, 150, 150], np.uint8)
+
+        YELLOW_MIN = np.array([255, 226, 143], np.uint8)
+        YELLOW_MAX = np.array([255, 199, 37], np.uint8)
+
+        blur_hsv_white = cv2.inRange(blur_hsv, WHITE_MIN, WHITE_MAX)
+        if curr_frame == 1:
+            mpimg.imsave("1_hsv_white_" + str(curr_frame), blur_hsv_white)
+
+        blur_hsv_yellow = cv2.inRange(blur_hsv, YELLOW_MIN, YELLOW_MAX)
+        if curr_frame == 1:
+            mpimg.imsave("1_hsv_yellow_" + str(curr_frame), blur_hsv_yellow)
+
+        # Define our parameters for Canny and run it
+        low_threshold = curr_pipeline_context.canny_low_threshold
+        high_threshold = curr_pipeline_context.canny_high_threshold
+        edges = canny(blur_hsv, low_threshold, high_threshold)
+
+        if curr_frame == 1:
+            mpimg.imsave("1_hsv_canny_" + str(curr_frame), edges)
+
+    else:
+        # call as plt.imshow(gray, cmap='gray') to show a grayscaled image
+        gray = grayscale(image)
+        # plt.imshow(gray, cmap='gray')
+        # plt.show()
+
+
+        # Define a kernel size for Gaussian smoothing / blurring
+        kernel_size = curr_pipeline_context.gaussian_kernel_size  # Must be an odd number (3, 5, 7...)
+        blur_gray = gaussian_noise(gray, kernel_size)
+
+        # Define our parameters for Canny and run it
+        low_threshold = curr_pipeline_context.canny_low_threshold
+        high_threshold = curr_pipeline_context.canny_high_threshold
+        edges = canny(blur_gray, low_threshold, high_threshold)
 
     # Display the image
     # plt.imshow(edges, cmap='Greys_r')
@@ -333,19 +445,21 @@ def process_image(image):
     # This time we are defining a four sided polygon to mask
     imshape = image.shape
 
-    bottom_offset = 55
+    bottom_offset = curr_pipeline_context.region_bottom_offset
     img_height = imshape[0]
     img_width = imshape[1]
 
     # (W, H) == (x, y)
     vertices = np.array([
         [
-            (bottom_offset, img_height),  # bottom left
-            (img_width * 0.48, img_height * 0.60),  # top left
-            (img_width * 0.54, img_height * 0.60),  # top right
-            (img_width - bottom_offset, img_height)  # bottom right
+            (bottom_offset, img_height) * curr_pipeline_context.region_vertice_weights[0],  # bottom left
+            (img_width, img_height) * curr_pipeline_context.region_vertice_weights[1],  # top left
+            (img_width, img_height) * curr_pipeline_context.region_vertice_weights[2],  # top right
+            (img_width - bottom_offset, img_height) * curr_pipeline_context.region_vertice_weights[3]  # bottom right
         ]
     ], dtype=np.int32)
+
+    curr_pipeline_context.vertices = vertices
 
     masked_edges = region_of_interest(edges, vertices)
 
@@ -359,13 +473,13 @@ def process_image(image):
     # min_line_length = 10
     # max_line_gap = 1
 
-    rho = 2
-    theta = np.pi / 180
-    threshold = 40
-    min_line_length = 20
-    max_line_gap = 50
+    rho = curr_pipeline_context.hough_transform_pipeline.rho
+    theta = curr_pipeline_context.hough_transform_pipeline.theta
+    threshold = curr_pipeline_context.hough_transform_pipeline.threshold
+    min_line_length = curr_pipeline_context.hough_transform_pipeline.min_line_length
+    max_line_gap = curr_pipeline_context.hough_transform_pipeline.max_line_gap
 
-    result = hough_lines(image, masked_edges, rho, theta, threshold, min_line_length, max_line_gap)
+    hough = hough_lines(image, masked_edges, rho, theta, threshold, min_line_length, max_line_gap)
 
     # Create a "color" binary image to combine with line image
     color_edges = np.dstack((edges, edges, edges))
@@ -373,9 +487,19 @@ def process_image(image):
     α = 0.8
     β = 1.
     λ = 0.
-    result = weighted_img(result, image, α, β, λ)
+    weighted_hough = weighted_img(hough, image, α, β, λ)
 
-    return result
+    # if curr_frame == 1:
+    #     mpimg.imsave("1_orig_" + str(curr_frame), image)
+    #     mpimg.imsave("2_gray_" + str(curr_frame), gray, cmap='gray')
+    #     mpimg.imsave("3_edges_" + str(curr_frame), edges, cmap='Greys_r')
+    #     mpimg.imsave("4_hough_" + str(curr_frame), hough)
+    #     mpimg.imsave("5_color_edges_" + str(curr_frame), color_edges)
+    #     mpimg.imsave("6_weighted_huff_" + str(curr_frame), weighted_hough)
+    # else:
+    #     mpimg.imsave("5_color_edges_" + str(curr_frame), color_edges)
+
+    return weighted_hough
 
 
 #
@@ -388,36 +512,49 @@ def process_image(image):
 
 import os
 
-for image_name in os.listdir("test_images/"):
-    if image_name == '.DS_Store':
-    # if image_name == '.DS_Store' or image_name != 'whiteCarLaneSwitch.jpg':
-    # if image_name == '.DS_Store' or image_name != 'solidWhiteCurve.jpg':
-    # if image_name == '.DS_Store' or image_name != 'solidYellowCurve.jpg':
-    # if image_name == '.DS_Store' or image_name != 'solidYellowCurve2.jpg':
-    # if image_name == '.DS_Store' or image_name != 'horzLineTest.jpg':
-        continue
-    image = mpimg.imread('test_images/' + image_name)
-    result = process_image(image)
-    mpimg.imsave("RENDERED_" + image_name, result)
+# This pipeline context is sufficient for all test_images as well as for solidYellowLeft.mp4 and solidWhiteRight.mp4
+curr_pipeline_context = PipelineContext(gaussian_kernel_size=3, canny_low_threshold=50, canny_high_threshold=150,
+                                        region_bottom_offset=55,
+                                        region_vertice_weights=np.array([(1, 1), (0.48, 0.60), (0.54, 0.60), (1, 1)]),
+                                        hough_transform_pipeline=HoughTransformPipeline(rho=2, theta=np.pi / 180,
+                                                                                        threshold=40,
+                                                                                        min_line_length=10,
+                                                                                        max_line_gap=120))
 
+# for image_name in os.listdir("test_images/"):
+#     if image_name == '.DS_Store':
+#         continue
+#     image = mpimg.imread('test_images/' + image_name)
+#     result = process_image(image)
+#     mpimg.imsave("RENDERED_" + image_name, result)
 
 # Import everything needed to edit/save/watch video clips
 from moviepy.editor import VideoFileClip
 
-white_output = 'white.mp4'
-clip1 = VideoFileClip("solidWhiteRight.mp4")
-white_clip = clip1.fl_image(process_image)
-white_clip.write_videofile(white_output, audio=False)
+# white_output = 'white.mp4'
+# clip1 = VideoFileClip("solidWhiteRight.mp4")
+# white_clip = clip1.fl_image(process_image)
+# white_clip.write_videofile(white_output, audio=False)
 
-yellow_output = 'yellow.mp4'
-clip2 = VideoFileClip('solidYellowLeft.mp4')
-yellow_clip = clip2.fl_image(process_image)
-yellow_clip.write_videofile(yellow_output, audio=False)
+# yellow_output = 'yellow.mp4'
+# clip2 = VideoFileClip('solidYellowLeft.mp4')
+# yellow_clip = clip2.fl_image(process_image)
+# yellow_clip.write_videofile(yellow_output, audio=False)
 
-# challenge_output = 'extra.mp4'
-# clip2 = VideoFileClip('challenge.mp4')
-# challenge_clip = clip2.fl_image(process_image)
-# challenge_clip.write_videofile(challenge_output, audio=False)
+# This pipeline context is sufficient for all test_images as well as for solidYellowLeft.mp4 and solidWhiteRight.mp4
+curr_pipeline_context = PipelineContext(gaussian_kernel_size=3, canny_low_threshold=50, canny_high_threshold=150,
+                                        region_bottom_offset=55,
+                                        region_vertice_weights=np.array(
+                                            [(1, 0.95), (0.40, 0.65), (0.60, 0.65), (1, 0.935)]),
+                                        hough_transform_pipeline=HoughTransformPipeline(rho=2, theta=np.pi / 180,
+                                                                                        threshold=40,
+                                                                                        min_line_length=15,
+                                                                                        max_line_gap=250))
+
+challenge_output = 'extra.mp4'
+clip2 = VideoFileClip('challenge.mp4')
+challenge_clip = clip2.fl_image(process_image)
+challenge_clip.write_videofile(challenge_output, audio=False)
 
 # me_output = 'me2.mp4'
 # clip2 = VideoFileClip('custom_me_night_2.mp4')
