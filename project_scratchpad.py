@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
 import cv2
+import colorsys
+
 # matploylib inline
 
 #   Some OpenCV functions (beyond those introduced in the lesson) that might be useful for this project are:
@@ -143,10 +145,10 @@ def draw_left_line(img, lines, color=[255, 0, 0], thickness=5):
         left_intercepts.append(b)
 
     # Find the average of all slopes and y-intercepts to essentially center the final line along the lane line
-    m = sum(left_slopes) / len(left_slopes)
-    b = sum(left_intercepts) / len(left_intercepts)
+    # m = sum(left_slopes) / len(left_slopes)
+    # b = sum(left_intercepts) / len(left_intercepts)
 
-    # m, b = find_least_squares_line(lines)
+    m, b = find_least_squares_line(lines)
 
     # print('least squares line: y = ', m, '*x', '+', b)
     # print('left line count: ', len(lines))
@@ -207,10 +209,10 @@ def draw_right_line(img, lines, color=[255, 0, 0], thickness=5):
         intercepts.append(b)
 
     # Find the average of all slopes and y-intercepts to essentially center the final line along the lane line
-    m = sum(slopes) / len(slopes)
-    b = sum(intercepts) / len(intercepts)
+    # m = sum(slopes) / len(slopes)
+    # b = sum(intercepts) / len(intercepts)
 
-    # m, b = find_least_squares_line(lines)
+    m, b = find_least_squares_line(lines)
 
     # Smooth out our y1 by remembering the smallest y1
     # doesn't work well on curves at which point I would switch to a
@@ -397,19 +399,25 @@ def process_image(image, cvt_hsv=False):
         if curr_frame == 1:
             mpimg.imsave("1_hsv_blur_" + str(curr_frame), blur_hsv)
 
-        WHITE_MIN = np.array([50, 50, 50], np.uint8)
-        WHITE_MAX = np.array([150, 150, 150], np.uint8)
+        WHITE_MIN_RGB = np.uint8([[[50, 50, 50]]])
+        WHITE_MAX_RGB = np.uint8([[[150, 150, 150]]])
 
-        YELLOW_MIN = np.array([255, 226, 143], np.uint8)
-        YELLOW_MAX = np.array([255, 199, 37], np.uint8)
+        WHITE_MIN_HSV = cv2.cvtColor(WHITE_MIN_RGB, cv2.COLOR_BGR2HSV)
+        WHITE_MAX_HSV = cv2.cvtColor(WHITE_MAX_RGB, cv2.COLOR_BGR2HSV)
+
+        WHITE_MIN = np.array(WHITE_MIN_HSV, np.uint8)
+        WHITE_MAX = np.array(WHITE_MAX_HSV, np.uint8)
+
+        # YELLOW_MIN = np.array([255, 226, 143], np.uint8)
+        # YELLOW_MAX = np.array([255, 199, 37], np.uint8)
 
         blur_hsv_white = cv2.inRange(blur_hsv, WHITE_MIN, WHITE_MAX)
         if curr_frame == 1:
             mpimg.imsave("1_hsv_white_" + str(curr_frame), blur_hsv_white)
 
-        blur_hsv_yellow = cv2.inRange(blur_hsv, YELLOW_MIN, YELLOW_MAX)
-        if curr_frame == 1:
-            mpimg.imsave("1_hsv_yellow_" + str(curr_frame), blur_hsv_yellow)
+        # blur_hsv_yellow = cv2.inRange(blur_hsv, YELLOW_MIN, YELLOW_MAX)
+        # if curr_frame == 1:
+        #     mpimg.imsave("1_hsv_yellow_" + str(curr_frame), blur_hsv_yellow)
 
         # Define our parameters for Canny and run it
         low_threshold = curr_pipeline_context.canny_low_threshold
@@ -531,15 +539,15 @@ curr_pipeline_context = PipelineContext(gaussian_kernel_size=3, canny_low_thresh
 # Import everything needed to edit/save/watch video clips
 from moviepy.editor import VideoFileClip
 
-# white_output = 'white.mp4'
-# clip1 = VideoFileClip("solidWhiteRight.mp4")
-# white_clip = clip1.fl_image(process_image)
-# white_clip.write_videofile(white_output, audio=False)
+white_output = 'white.mp4'
+clip1 = VideoFileClip("solidWhiteRight.mp4")
+white_clip = clip1.fl_image(process_image)
+white_clip.write_videofile(white_output, audio=False)
 
-# yellow_output = 'yellow.mp4'
-# clip2 = VideoFileClip('solidYellowLeft.mp4')
-# yellow_clip = clip2.fl_image(process_image)
-# yellow_clip.write_videofile(yellow_output, audio=False)
+yellow_output = 'yellow.mp4'
+clip2 = VideoFileClip('solidYellowLeft.mp4')
+yellow_clip = clip2.fl_image(process_image)
+yellow_clip.write_videofile(yellow_output, audio=False)
 
 # This pipeline context is sufficient for all test_images as well as for solidYellowLeft.mp4 and solidWhiteRight.mp4
 curr_pipeline_context = PipelineContext(gaussian_kernel_size=3, canny_low_threshold=50, canny_high_threshold=150,
@@ -551,10 +559,10 @@ curr_pipeline_context = PipelineContext(gaussian_kernel_size=3, canny_low_thresh
                                                                                         min_line_length=15,
                                                                                         max_line_gap=250))
 
-challenge_output = 'extra.mp4'
-clip2 = VideoFileClip('challenge.mp4')
-challenge_clip = clip2.fl_image(process_image)
-challenge_clip.write_videofile(challenge_output, audio=False)
+# challenge_output = 'extra.mp4'
+# clip2 = VideoFileClip('challenge.mp4')
+# challenge_clip = clip2.fl_image(process_image)
+# challenge_clip.write_videofile(challenge_output, audio=False)
 
 # me_output = 'me2.mp4'
 # clip2 = VideoFileClip('custom_me_night_2.mp4')
