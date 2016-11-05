@@ -518,18 +518,18 @@ pipeline_context = PipelineContext(gaussian_kernel_size=3, canny_low_threshold=5
                                                                                    max_line_gap=120))
 
 import os
-for image_name in os.listdir("test_images/"):
-    if image_name == '.DS_Store':
-        continue
-    pipeline_context.reset
-    result = pipeline_context.process_image(mpimg.imread('test_images/' + image_name))
-    mpimg.imsave("RENDERED_" + image_name, result)
+# for image_name in os.listdir("test_images/"):
+#     if image_name == '.DS_Store':
+#         continue
+#     pipeline_context.reset
+#     result = pipeline_context.process_image(mpimg.imread('test_images/' + image_name))
+#     mpimg.imsave("RENDERED_" + image_name, result)
 
 # Import everything needed to edit/save/watch video clips
 from moviepy.editor import VideoFileClip
 
-# pipeline_context.process_video('solidWhiteRight.mp4', 'white.mp4')
-# pipeline_context.process_video('solidYellowLeft.mp4', 'yellow.mp4')
+pipeline_context.process_video('solidWhiteRight.mp4', 'white.mp4')
+pipeline_context.process_video('solidYellowLeft.mp4', 'yellow.mp4')
 
 # This pipeline context is sufficient for all test_images as well as for solidYellowLeft.mp4 and solidWhiteRight.mp4
 pipeline_context = PipelineContext(gaussian_kernel_size=3, canny_low_threshold=50, canny_high_threshold=150,
