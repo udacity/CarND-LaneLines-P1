@@ -39,7 +39,8 @@ then to test if OpenCV is installed correctly:
 
 `> python`  
 `>>> import cv2`  
-`>>>`  
+`>>>`  (i.e. did not get an ImportError)
+
 (Ctrl-d to exit Python)
 
 **Step 3:** Installing moviepy  
@@ -54,7 +55,8 @@ and check that the install worked:
 
 `>python`  
 `>>>import moviepy`  
-`>>>`  
+`>>>`  (i.e. did not get an ImportError)
+
 (Ctrl-d to exit Python)
 
 **Step 4:** Opening the code in a Jupyter Notebook
