@@ -7,7 +7,7 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/grayscale.jpg "Grayscale"
+[image1]: ./Lane_line_detection.jpg "Lane Line Processing"
 
 ---
 
@@ -36,7 +36,6 @@ x_top = (y_bmax - y0)/a + x0
 
 Finally, in this way the left/right line segments are represented as [ (x_bottom, y_bmin), (x_top, y_bmax)]
 
-If you'd like to include images to show how the pipeline works, here is how to include an image: 
 
 ![alt text][image1]
 
