@@ -52,7 +52,12 @@ def region_of_interest(img, vertices):
     return masked_image
 
 
-def draw_lines(img, lines, color=(255, 0, 0), thickness=2):
+def get_line_eqn(x1, y1, x2, y2):
+    m = (y2-y1)/(x2-x1)
+    b = y1 - m*x1
+    return m, b
+
+def draw_lines(img, lines, vertical_limits, color=(255, 0, 0), thickness=2):
     """
     NOTE: this is the function you might want to use as a starting point once you want to
     average/extrapolate the line segments you detect to map out the full
@@ -69,12 +74,38 @@ def draw_lines(img, lines, color=(255, 0, 0), thickness=2):
     If you want to make the lines semi-transparent, think about combining
     this function with the weighted_img() function below
     """
+
+    # Group similar lines
+    left_lane_lines = []
+    right_lane_lines = []
+
     for line in lines:
-        for x1, y1, x2, y2 in line:
-            cv2.line(img, (x1, y1), (x2, y2), color, thickness)
+        line = line[0]
+        if get_line_eqn(*line)[0] > 0:
+            left_lane_lines.append(line)
+        else:
+            right_lane_lines.append(line)
+
+    # Average similar lines
+    avg_left_lane_lines = np.mean(left_lane_lines, axis=0, dtype=int)
+    avg_right_lane_lines = np.mean(right_lane_lines, axis=0, dtype=int)
+    lane_lines = [avg_left_lane_lines, avg_right_lane_lines]
+
+    # Extrapolate similar line
+    extrapolated_lines = []
+    y1, y2 = vertical_limits
+    for lane_line in lane_lines:
+        m, b = get_line_eqn(*lane_line)
+        x1 = (y1 - b) / m
+        x2 = (y2 - b) / m
+        extrapolated_lines.append(np.array([x1, y1, x2, y2], dtype=int))
+
+    for line in extrapolated_lines:
+        x1, y1, x2, y2 = line
+        cv2.line(img, (x1, y1), (x2, y2), color, thickness)
 
 
-def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
+def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap, vertical_limits):
     """
     `img` should be the output of a Canny transform.
 
@@ -83,7 +114,7 @@ def hough_lines(img, rho, theta, threshold, min_line_len, max_line_gap):
     lines = cv2.HoughLinesP(img, rho, theta, threshold, np.array([]), minLineLength=min_line_len,
                             maxLineGap=max_line_gap)
     line_img = np.zeros((img.shape[0], img.shape[1], 3), dtype=np.uint8)
-    draw_lines(line_img, lines)
+    draw_lines(line_img, lines, vertical_limits)
     return line_img
 
 
@@ -115,8 +146,8 @@ def lane_finding(raw_image):
 
     # Crop up the region of interest
     image_height, image_width = image.shape
-    top_left = (0.46*image_width, 0.54*image_height)
-    top_right = (0.51*image_width, 0.54*image_height)
+    top_left = (0.46*image_width, 0.60*image_height)
+    top_right = (0.51*image_width, 0.60*image_height)
     bottom_left = (0*image_width, image_height)
     bottom_right = (image_width, image_height)
     vertices = np.array([[bottom_left, top_left, top_right, bottom_right]], dtype=np.int32)
@@ -125,10 +156,11 @@ def lane_finding(raw_image):
     # Apply Hough Transform to get lanes
     rho = 2  # distance resolution in pixels of the Hough grid
     theta = np.pi * 1 / 180  # angular resolution in radians of the Hough grid
-    threshold = 125  # minimum number of votes (intersections in Hough grid cell)
-    min_line_length = 100  # minimum number of pixels making up a line
-    max_line_gap = 30  # maximum gap in pixels between connectable line segments
-    image = hough_lines(image, rho, theta, threshold, min_line_length, max_line_gap)
+    threshold = 50  # minimum number of votes (intersections in Hough grid cell)
+    min_line_length = 60  # minimum number of pixels making up a line
+    max_line_gap = 50  # maximum gap in pixels between connectable line segments
+    image = hough_lines(image, rho, theta, threshold, min_line_length, max_line_gap,
+                        vertical_limits=(bottom_left[1], top_left[1]))
 
     # Over identified lanes on the original image
     overlay_image = weighted_img(image, raw_image, alpha=0.3, beta=1.0, gamma=0.2)
