@@ -50,7 +50,7 @@ And also one important shortcoming of this pipeline is that all steps are implem
 
   3. Suggest possible improvements to your pipeline
 
-A possible improvement for the first shortcoming would be to an adaptive calibration needs to be done before drawline() is called. 
+A possible improvement for the first shortcoming would be to add an adaptive calibration done before drawline() is called. 
 
 Another potential improvement for the second shortcoming could be to mask the image with area of interest as early as possible. This is can be easily done if we have a fixed stable area of interest, but would be hard to do if an adaptive calibration is needed for the area of interest, which it self needs some preprocessing. 
 
