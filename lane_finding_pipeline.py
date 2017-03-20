@@ -4,6 +4,9 @@ import matplotlib.image as mpimg
 import numpy as np
 import os
 import cv2
+import imageio
+imageio.plugins.ffmpeg.download()
+from moviepy.editor import VideoFileClip
 
 
 def grayscale(img):
@@ -87,9 +90,13 @@ def draw_lines(img, lines, vertical_limits, color=(255, 0, 0), thickness=2):
             right_lane_lines.append(line)
 
     # Average similar lines
-    avg_left_lane_lines = np.mean(left_lane_lines, axis=0, dtype=int)
-    avg_right_lane_lines = np.mean(right_lane_lines, axis=0, dtype=int)
-    lane_lines = [avg_left_lane_lines, avg_right_lane_lines]
+    lane_lines = []
+    if left_lane_lines:
+        avg_left_lane_lines = np.mean(left_lane_lines, axis=0, dtype=int)
+        lane_lines.append(avg_left_lane_lines)
+    if right_lane_lines:
+        avg_right_lane_lines = np.mean(right_lane_lines, axis=0, dtype=int)
+        lane_lines.append(avg_right_lane_lines)
 
     # Extrapolate similar line
     extrapolated_lines = []
@@ -162,14 +169,17 @@ def lane_finding(raw_image):
     image = hough_lines(image, rho, theta, threshold, min_line_length, max_line_gap,
                         vertical_limits=(bottom_left[1], top_left[1]))
 
-    # Over identified lanes on the original image
-    overlay_image = weighted_img(image, raw_image, alpha=0.3, beta=1.0, gamma=0.2)
-    plt.imshow(overlay_image, cmap='gray')
-    plt.show()
+    return image
+
+def process_image(image):
+    annotated_image = lane_finding(image)
+    overlay_image = weighted_img(annotated_image, image, alpha=0.3, beta=1.0, gamma=0.2)
+    return overlay_image
 
 
 if __name__ == "__main__":
 
+    # First, annotate images
     test_image_files_dir = os.path.join(os.getcwd(), "test_images")
     raw_image_files = os.listdir(test_image_files_dir)
 
@@ -177,4 +187,22 @@ if __name__ == "__main__":
         raw_image_full_path = os.path.join(test_image_files_dir, raw_image_file)
         raw_image = mpimg.imread(raw_image_full_path)
 
-        lane_finding(raw_image)
+        annotated_image = lane_finding(raw_image)
+
+        # Over identified lanes on the original image
+        overlay_image = weighted_img(annotated_image, raw_image, alpha=0.3, beta=1.0, gamma=0.2)
+        plt.imshow(overlay_image)
+        #plt.show()
+
+    # Second, annotate videos
+    test_video_files_dir = os.path.join(os.getcwd(), "test_videos")
+    annotated_video_files_dir = os.path.join(os.getcwd(), "test_videos_output")
+    raw_video_files = os.listdir(test_video_files_dir)
+
+    for raw_video_file in raw_video_files:
+        raw_video_full_path = os.path.join(test_video_files_dir, raw_video_file)
+        annotated_video_full_path = os.path.join(annotated_video_files_dir, raw_video_file)
+
+        raw_video = VideoFileClip(raw_video_full_path)
+        annotated_video = raw_video.fl_image(process_image)
+        annotated_video.write_videofile(annotated_video_full_path, audio=False)
