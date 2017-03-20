@@ -181,22 +181,28 @@ if __name__ == "__main__":
 
     # First, annotate images
     test_image_files_dir = os.path.join(os.getcwd(), "test_images")
+    annotated_image_files_dir = os.path.join(os.getcwd(), "test_images_output")
+    if not os.path.exists(annotated_image_files_dir):
+        os.makedirs(annotated_image_files_dir)
     raw_image_files = os.listdir(test_image_files_dir)
 
     for raw_image_file in raw_image_files:
         raw_image_full_path = os.path.join(test_image_files_dir, raw_image_file)
-        raw_image = mpimg.imread(raw_image_full_path)
+        annotated_image_full_path = os.path.join(annotated_image_files_dir, raw_image_file)
 
+        raw_image = mpimg.imread(raw_image_full_path)
         annotated_image = lane_finding(raw_image)
 
-        # Over identified lanes on the original image
+        # Overlay the identified lanes on the original image
         overlay_image = weighted_img(annotated_image, raw_image, alpha=0.3, beta=1.0, gamma=0.2)
         plt.imshow(overlay_image)
-        #plt.show()
+        plt.savefig(annotated_image_full_path, bbox_inches="tight", frameon=False)
 
     # Second, annotate videos
     test_video_files_dir = os.path.join(os.getcwd(), "test_videos")
     annotated_video_files_dir = os.path.join(os.getcwd(), "test_videos_output")
+    if not os.path.exists(annotated_video_files_dir):
+        os.makedirs(annotated_video_files_dir)
     raw_video_files = os.listdir(test_video_files_dir)
 
     for raw_video_file in raw_video_files:
