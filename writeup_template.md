@@ -16,6 +16,9 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: ./examples/grayscale.jpg "Grayscale"
+[yellow_img]: ./screen_cap/yellow.png "yellow color pic"
+
+
 
 ---
 
@@ -30,6 +33,11 @@ In order to draw a single line on the left and right lanes, I modified the draw_
 If you'd like to include images to show how the pipeline works, here is how to include an image: 
 
 ![alt text][image1]
+
+to maximize the effectiness in picking out yellow, we first inspect the specific color of yellow we are working with:
+![alt text][yellow_img]
+here using Digital color meter, we can see it's a specific range of RGB (240, 200, 70), plus minus 20. 
+
 
 
 ###2. Identify potential shortcomings with your current pipeline
