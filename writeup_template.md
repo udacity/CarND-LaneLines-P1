@@ -59,23 +59,21 @@ Finally the resulting averages lines is drawn over the original input image fram
 
 ![alt text][7]
 
-
-to maximize the effectiness in picking out yellow, we first inspect the specific color of yellow we are working with:
-![alt text][yellow_img]
-here using Digital color meter, we can see it's a specific range of RGB (240, 200, 70), plus minus 20. 
-
-
-
 ###2. Identify potential shortcomings with your current pipeline
 
+I the video i noticed minor jump from frame to frame on lane detection location. 
 
-One potential shortcoming would be what would happen when ... 
+The largest flaw int the current pipeline is how the lanes is estimated through averaging; the assumption that the entire image will only be consisted by 2 lane marking sepeated by positive and negative slope breakdown under a few different scenarios:
+1. multiple parallel lines from adjcent lanes are detected
+2. when vehicle orientation with respect the the lane changes (e.g instead parallel, intersect the lane or at a angle). 
+3. when there is other strong lines features in image (e.g wall/edge from building)
 
-Another shortcoming could be ...
-
+It is also possible that sometimes there is or left or right lane marking (e.g due to deteriorated paint marking), in which case the average math breakdown due to divide by zero error. The particular this  case is accounted for by an explict corner check in the code. Another divide by zero can show up in a rare corner case where the average slope happen to be zero as well. 
 
 ###3. Suggest possible improvements to your pipeline
 
-A possible improvement would be to ...
+For the lane detection frame to frame jump, a slide window filter could be use frame to frame to smooth out the lane location change. 
 
-Another potential improvement could be to ...
+For the lane location detection corner cases, one possible improvement is make use the color of lane (yellow and white) infomation directly, which will likely improve detection accuracy. Current the canny edge detection technique largely ignores this info. 
+
+Finally for the potential zero slope corner case, I could switch the lane average math to polar coordinate rather than current Euclidean. 
