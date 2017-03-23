@@ -43,37 +43,37 @@ Followed by canny edge detection,
 
 ![alt text][3]
 
-A polygonal filtering region is applied to the detected edges to remove edge detect above horizon and near left/right side of the image. 
+A polygonal filtering region is applied to the detected edges to remove edge detect above the horizon and near left/right side of the image. 
 
 ![alt text][4]
 
-Then the remaining edges are feed into hough transform to detect best fit lines. It worth noting that the parameters are tuned to extract relative long lines (at least 150 pixel long) - under the assumption that  lane marking form some of the longest line on the image, and allowed for large gap (up to 100 pixels) since there are large gap for lane divier markings.  
+Then the remaining edges are feed into hough transform to detect best-fit lines. It worth noting that the parameters are tuned to extract relative long lines (at least 150 pixels long) - under the assumption that lane marking from some of the longest lines on the image, and allowed for a large gap (up to 100 pixels) since there is large gap for lane divider markings.  
 
 ![alt text][5]
 
-In order to draw a single line on the left and right lanes, I modified the draw_lines() function by calculating the slope and intersect for each detected line from the two points. On inspection of the calulated values, it's clear that a relative consistant postive and negative slope represent the left and rigth lans. So I groupped the resulting parameterized lines by postive and negaive slope value, then computed average slope and intersect  from each of the two groups; given we want to draw and extrapolate line near bottom of the image to near horizon, two points are calculated for each of 2 average lines with fixed y1 and y2 that crosspond to bottom of image and about halfway up in image coordinates. 
+In order to draw a single line on the left and right lanes, I modified the draw_lines() function by calculating the slope and intersect for each detected line from the two points. On inspection of the calculated values, it's clear that a relative consistent positive and negative slope represent the left and right lanes. So I grouped the resulting parameterized lines by positive and negative slope value, then computed average slope and intersect  from each of the two groups; given we want to draw and extrapolate line near bottom of the image to near horizon, two points are calculated for each of 2 average lines with fixed y1 and y2 that crosspond to bottom of image and about halfway up in image coordinates. 
 
 ![alt text][6]
 
-Finally the resulting averages lines is drawn over the original input image frame. 
+Finally, the resulting averages lines are drawn over the original input image frame. 
 
 ![alt text][7]
 
 ###2. Identify potential shortcomings with your current pipeline
 
-I the video i noticed minor jump from frame to frame on lane detection location. 
+In the video I noticed minor jumps from frame to frame on lane detection location. 
 
-The largest flaw int the current pipeline is how the lanes is estimated through averaging; the assumption that the entire image will only be consisted by 2 lane marking sepeated by positive and negative slope breakdown under a few different scenarios:
-1. multiple parallel lines from adjcent lanes are detected
-2. when vehicle orientation with respect the the lane changes (e.g instead parallel, intersect the lane or at a angle). 
+The largest flaw int the current pipeline is how the lanes are estimated through averaging; the assumption that the entire image will only be consisted by 2 lanes marking separated by positive and negative slope breakdown under a few different scenarios:
+1. multiple parallel lines from adjacent lanes are detected
+2. when vehicle orientation with respect the lane changes (e.g instead parallel, intersect the lane or at an angle). 
 3. when there is other strong lines features in image (e.g wall/edge from building)
 
-It is also possible that sometimes there is or left or right lane marking (e.g due to deteriorated paint marking), in which case the average math breakdown due to divide by zero error. The particular this  case is accounted for by an explict corner check in the code. Another divide by zero can show up in a rare corner case where the average slope happen to be zero as well. 
+It is also possible that sometimes there is or left or right lane marking (e.g due to deteriorated paint marking), in which case the average math breakdown due to dividing by zero error. The particular this case is accounted for by an explicit corner check in the code. Another divide by zero can show up in a rare corner case where the average slope happens to be zero as well. 
 
 ###3. Suggest possible improvements to your pipeline
 
-For the lane detection frame to frame jump, a slide window filter could be use frame to frame to smooth out the lane location change. 
+For the lane detection frame to frame jump, a slide window filter could be used frame to frame to smooth out the lane location change. 
 
-For the lane location detection corner cases, one possible improvement is make use the color of lane (yellow and white) infomation directly, which will likely improve detection accuracy. Current the canny edge detection technique largely ignores this info. 
+For the lane location detection corner cases, one possible improvement is to make use the color of the lane (yellow and white) information directly, which will likely improve detection accuracy. Current the canny edge detection technique largely ignores this info. 
 
-Finally for the potential zero slope corner case, I could switch the lane average math to polar coordinate rather than current Euclidean. 
+Finally, for the potential zero slope corner case, I could switch the lane average math to polar coordinate rather than current Euclidean. 
