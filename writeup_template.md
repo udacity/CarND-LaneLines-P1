@@ -26,14 +26,14 @@ I created the image mask by converting to the HLS color space, which allows one 
 
 ![alt text][blurredGrayscaleExamples]
 
-I found edges and lines in the image using the provided helper functions.
+I found edges and lines in the image using the provided helper functions.  I played around with different minimum line lengths and maximum line gaps and settled on 30 for minimum line length and 60 for maximum line gap.  Having minimum line length be too small creates lots of false positivies, but having minimum line length too large prevents lanes from being found if only the majority of the visible line is made up of the short road refelectors rather than paint stripes.
 
 ![alt text][pipelineOutputs]
 
 
 ### 2. Identify potential shortcomings with your current pipeline
 
-By far, the biggest shortcoming of this pipeline is that it is extremely difficult and time consuming to hand-tune the hyperparameters.  Finding a set of values that worked for even the five example images was somewhat difficult because tweaking the parameters for one example image "broke" the results of a previous example image.  Having an labeled "training set" with which to find good ranges for the hyperparameters would be very helpful - you can see why deep learning has completely taken over!
+By far, the biggest shortcoming of this pipeline is that it is extremely difficult and time consuming to hand-tune the hyperparameters.  Finding a set of values that worked for even the five example images was somewhat difficult because tweaking the parameters for one example image "broke" the results of a previous example image.  Having an labeled "training set" with which to find good ranges for the hyperparameters would be very helpful - you can see why machine/deep learning has completely taken over!
 
 Another shortcoming of my pipeline is the region of interest.  If the road curves a lot, if the car is going up or down a hill, or if the car is changing lanes, the lines will go outside the region of interest I used.  I found that a more exapansive region of interest lead to too many false positives in the raw lines step, preventing accurate selection of the left and right groups of lines.
 
