@@ -11,10 +11,7 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[blurredGrayscaleExamples]: (./examples/blurredGrayscaleExamples.png) "Original (left) and blurred grayscale images (right)"
-[blurredGrayscale2]: (./examples/blurredGrayscale2.png) "Masked, grayscale output example 2"
-[original5]: (./examples/original5.png) "Original example 5"
-[blurredGrayscale5]: (./examples/blurredGrayscale5.png) "Masked, grayscale output example 5"
+[blurredGrayscaleExamples]: ./examples/blurredGrayscaleExamples.png "Original (left) and blurred grayscale images (right)"
 
 ---
 
