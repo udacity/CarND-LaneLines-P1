@@ -31,29 +31,18 @@ I found edges and lines in the image using the provided helper functions.
 ![alt text][pipelineOutputs]
 
 
-
-
-My pipeline consisted of 5 steps. First, I converted the images to grayscale, then I .... 
-
-In order to draw a single line on the left and right lanes, I modified the draw_lines() function by ...
-
-If you'd like to include images to show how the pipeline works, here is how to include an image: 
-
-
-
-
-
-
 ### 2. Identify potential shortcomings with your current pipeline
 
+By far, the biggest shortcoming of this pipeline is that it is extremely difficult and time consuming to hand-tune the hyperparameters.  Finding a set of values that worked for even the five example images was somewhat difficult because tweaking the parameters for one example image "broke" the results of a previous example image.  Having an labeled "training set" with which to find good ranges for the hyperparameters would be very helpful - you can see why deep learning has completely taken over!
 
-One potential shortcoming would be what would happen when ... 
-
-Another shortcoming could be ...
+Another shortcoming of my pipeline is the region of interest.  If the road curves a lot, if the car is going up or down a hill, or if the car is changing lanes, the lines will go outside the region of interest I used.  I found that a more exapansive region of interest lead to too many false positives in the raw lines step, preventing accurate selection of the left and right groups of lines.
 
 
 ### 3. Suggest possible improvements to your pipeline
 
-A possible improvement would be to ...
+One potential improvement would be to iteratively find the lane lines starting from nearer to the car, eliminating the need for a region of interest. For example you could do a first pass to come up with a guess for where the lines nearest the car are.  Then fit a polynomial to the line nearest the car and search for more line segments of the correct color by extrapolaing the fitted line as you move upward in the image.  I think this is going on to some extent in our brains/eyes if I told you to point out the furthest visible point on a lane line.  Iterative lane-finding would potentially allow for lines to be identified further from the car and also more accurately determine the curvature of the lines.
 
-Another potential improvement could be to ...
+A nother potential improvement would be to use a Kalman filter to smooth lane lines from frame to frame so that the occasional frame with incorrect lines doesn't have as much of an affect.
+
+I wonder to what extent Canny edge detectors and Hough transforms are still used in today's vision pipelines in industry.  Based on the trouble I've had tuning hyper-parameters and the very real possibility that a given region cannot be labeled using color or position alone, it seems very likely that some sort of semantic segmentation or other methods using neural networks would be used to incorporate larger scale structure (such as other parked or moving cars, road barriers, trees, etc.), when deciding where the lane is.
+
