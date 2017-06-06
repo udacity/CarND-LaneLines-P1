@@ -11,9 +11,7 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/grayscale.jpg "Grayscale"
-
-[hlsColor]: ./examples/hslColor.png "HLS color space"
+[hlsColor]: (./examples/hslColor.PNG) "HLS color space"
 
 ---
 
@@ -23,7 +21,7 @@ The goals / steps of this project are the following:
 
 My pipeline consisted of the following steps: creating an image mask to eliminate background noise, finding edges and lines within a region of interest, classifying lines into right and left groups, fitting a single lane line to each group and drawing it on the image.
 
-I created the image mask by converting to the HLS color space.
+I created the image mask by converting to the HLS color space, which allows one to easily select a range of colors, lightnesses, and saturations.  For example, yellow colors can be selected using the range [180-255, 180-255, 50-150]  (i.e. yellow hue of most brightnesses and saturations) and white colors can be selected using the range [0-255, 200-255, 0-255] (i.e. any color of sufficient brightness).
 
 create an image mask by selecting areas that are yellow, white, or 
 
@@ -33,7 +31,9 @@ In order to draw a single line on the left and right lanes, I modified the draw_
 
 If you'd like to include images to show how the pipeline works, here is how to include an image: 
 
-![alt text][hlsColor]
+
+
+
 
 
 ### 2. Identify potential shortcomings with your current pipeline
