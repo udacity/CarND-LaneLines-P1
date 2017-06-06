@@ -11,7 +11,10 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[hlsColor]: (./examples/hslColor.PNG) "HLS color space"
+[blurredGrayscaleExamples]: (./examples/blurredGrayscaleExamples.png) "Original (left) and blurred grayscale images (right)"
+[blurredGrayscale2]: (./examples/blurredGrayscale2.png) "Masked, grayscale output example 2"
+[original5]: (./examples/original5.png) "Original example 5"
+[blurredGrayscale5]: (./examples/blurredGrayscale5.png) "Masked, grayscale output example 5"
 
 ---
 
@@ -21,9 +24,14 @@ The goals / steps of this project are the following:
 
 My pipeline consisted of the following steps: creating an image mask to eliminate background noise, finding edges and lines within a region of interest, classifying lines into right and left groups, fitting a single lane line to each group and drawing it on the image.
 
-I created the image mask by converting to the HLS color space, which allows one to easily select a range of colors, lightnesses, and saturations.  For example, yellow colors can be selected using the range [180-255, 180-255, 50-150]  (i.e. yellow hue of most brightnesses and saturations) and white colors can be selected using the range [0-255, 200-255, 0-255] (i.e. any color of sufficient brightness).
+I created the image mask by converting to the HLS color space, which allows one to easily select a range of colors, lightnesses, and saturations.  For example, yellow colors can be selected using the range [180-255, 180-255, 50-150]  (i.e. yellow hue of most brightnesses and saturations) and white colors can be selected using the range [0-255, 200-255, 0-255] (i.e. any color of sufficient brightness).  I then returned a blurred, grayscale image where the selected areas were unchanged, but all other regions were colored black:
 
-create an image mask by selecting areas that are yellow, white, or 
+![alt text][blurredGrayscaleExamples]
+
+I found edges and lines in the image using the provided helper functions.
+
+
+
 
 My pipeline consisted of 5 steps. First, I converted the images to grayscale, then I .... 
 
