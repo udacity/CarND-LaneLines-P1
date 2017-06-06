@@ -12,6 +12,7 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [blurredGrayscaleExamples]: ./examples/blurredGrayscaleExamples.png "Original (left) and blurred grayscale images (right)"
+[pipelineOutputs]: ./examples/pipelineOutputs.png "Pipeline intermediate outputs"
 
 ---
 
@@ -26,6 +27,8 @@ I created the image mask by converting to the HLS color space, which allows one 
 ![alt text][blurredGrayscaleExamples]
 
 I found edges and lines in the image using the provided helper functions.
+
+![alt text][pipelineOutputs]
 
 
 
