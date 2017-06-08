@@ -33,9 +33,11 @@ I found edges and lines in the image using the provided helper functions.  I pla
 
 ### 2. Identify potential shortcomings with your current pipeline
 
-By far, the biggest shortcoming of this pipeline is that it is extremely difficult and time consuming to hand-tune the hyperparameters.  Finding a set of values that worked for even the five example images was somewhat difficult because tweaking the parameters for one example image "broke" the results of a previous example image.  Having an labeled "training set" with which to find good ranges for the hyperparameters would be very helpful - you can see why machine/deep learning has completely taken over!
+By far, the biggest shortcoming of this pipeline is that it is extremely difficult and time consuming to hand-tune the hyperparameters.  Finding a set of values that worked for even the five example images was somewhat difficult because tweaking the parameters for one example image "broke" the results of a previous example image.  Having an labeled "training set" with which to find good ranges for the hyperparameters would be very helpful - you can see why the machine/deep learning paradigm has completely taken over!
 
 Another shortcoming of my pipeline is the region of interest.  If the road curves a lot, if the car is going up or down a hill, or if the car is changing lanes, the lines will go outside the region of interest I used.  I found that a more exapansive region of interest lead to too many false positives in the raw lines step, preventing accurate selection of the left and right groups of lines.
+
+To find left and right lane lines, I used a simple slope range criteria and then removed lines that were not within 0.05 of the median slope and within 50 of the median intercept. Median filtering is a very basic way of filtering out bad lines. A more robust method would be to fit a surface to the joint distribution of slopes and intercepts and take the two largest peaks that satisfy certain distance and prominance requirements.
 
 
 ### 3. Suggest possible improvements to your pipeline
