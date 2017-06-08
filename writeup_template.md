@@ -26,7 +26,7 @@ I created the image mask by converting to the HLS color space, which allows one 
 
 ![alt text][blurredGrayscaleExamples]
 
-I found edges and lines in the image using the provided helper functions.  I played around with different minimum line lengths and maximum line gaps and settled on 30 for minimum line length and 60 for maximum line gap.  Having minimum line length be too small creates lots of false positivies, but having minimum line length too large prevents lanes from being found if only the majority of the visible line is made up of the short road refelectors rather than paint stripes.
+I found edges and lines in the image using the provided helper functions.  I played around with different minimum line lengths and maximum line gaps and settled on 30 for minimum line length and 60 for maximum line gap.  Having minimum line length be too small created too many false positivies, but having minimum line length too large prevented lanes from being found when the majority of the visible line is made up of the short road refelectors rather than paint stripes.
 
 ![alt text][pipelineOutputs]
 
