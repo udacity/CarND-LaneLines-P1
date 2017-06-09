@@ -30,7 +30,7 @@ I found edges and lines in the image using the provided helper functions.  I pla
 
 ![alt text][pipelineOutputs]
 
-I classified detected lines into left and right groups using slope criteria.  I assumed lines belonging to the left lane line had slopes between 0.3 and 0.8 and those for the right lane line between -0.3 and -0.8.  Note that this method caused some trouble on the curved road in the challenge video! I then filtered the lines around the median, returning a subset of the lines that fell within 0.05 of the median slope and 50 pixels of the median intercept.  I then experimented with fitting a line, quadratic, or spline to the filtered lines.  I found that the 
+I classified detected lines into left and right groups using slope criteria.  I assumed lines belonging to the left lane line had slopes between 0.3 and 0.8 and those for the right lane line between -0.3 and -0.8.  Note that this method caused some trouble on the curved road in the challenge video! I then filtered the lines around the median, returning a subset of the lines that fell within 0.05 of the median slope and 50 pixels of the median intercept.  I then experimented with fitting a line, quadratic, or spline to the filtered lines.  I found that the linear fit did a pretty good job of highlighting the lanelines.  A quadratic fit or a spline with a slope prior near the bottom of the screen would allow for curved lane lines.  Finally, I drew line segments between the fitted points on the original image.
 
 ### 2. Identify potential shortcomings with your current pipeline
 
