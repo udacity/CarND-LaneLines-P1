@@ -1,11 +1,5 @@
 # **Finding Lane Lines on the Road** 
 
-## Writeup Template
-
-### You can use this file as a template for your writeup if you want to submit it as a markdown file. But feel free to use some other method and submit a pdf if you prefer.
-
----
-
 **Finding Lane Lines on the Road**
 
 The goals / steps of this project are the following:
@@ -15,33 +9,30 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/grayscale.jpg "Grayscale"
+[image1]: ./test_images/detected/solidWhiteCurve_detected.jpg "TestImageDetected"
+[image2]: ./test_images/solidWhiteCurve.jpg "TestImage"
 
 ---
 
 ### Reflection
 
-### 1. Describe your pipeline. As part of the description, explain how you modified the draw_lines() function.
+### 1. The Approach
 
-My pipeline consisted of 5 steps. First, I converted the images to grayscale, then I .... 
+The detections of lane pipeline was pretty straightforward based on techniques taught in the lectures:
+1. Use a Gaussian Kernel to filter the image
+2. Perform Canny edge detection 
+3. Use Hough transform to find lines from the edges
 
-In order to draw a single line on the left and right lanes, I modified the draw_lines() function by ...
+The test images can be found in the folder - "test_images" while the images with lane detections can be found in - "test_images/detected"
 
-If you'd like to include images to show how the pipeline works, here is how to include an image: 
-
-![alt text][image1]
-
-
-### 2. Identify potential shortcomings with your current pipeline
+My path to this project was to understand the way my referenced project was implemented and then only once I had complete understanding of the project, proceed with using the code on it to create this submission.
 
 
-One potential shortcoming would be what would happen when ... 
+### 2. Suggest possible improvements to your pipeline
 
-Another shortcoming could be ...
+The line connections can possibly be done in multiple ways. Another possible way this could be done would be work with hough transform and draw straight lines from hough transform.
 
+### 3. References Citing
 
-### 3. Suggest possible improvements to your pipeline
-
-A possible improvement would be to ...
-
-Another potential improvement could be to ...
+There are multiple resources out on the internet with respect to this project.
+https://github.com/CYHSM/carnd/tree/master/CarND-LaneLines-P1 - was the project I followed.
