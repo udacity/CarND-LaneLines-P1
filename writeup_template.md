@@ -2,17 +2,13 @@
 
 ---
 
-**Finding Lane Lines on the Road**
-
-The goals / steps of this project are the following:
-* Make a pipeline that finds lane lines on the road
-* Reflect on your work in a written report
-
-
 [//]: # (Image References)
 
 [blurredGrayscaleExamples]: ./examples/blurredGrayscaleExamples.png "Original (left) and blurred grayscale images (right)"
 [pipelineOutputs]: ./examples/pipelineOutputs.png "Pipeline intermediate outputs"
+[solidWhiteRight]: ./examples/solidWhiteRight.gif "Final output of the lane line pipeline"
+[solidYellowLeft]: ./examples/solidYellowLeft.gif "Final output of the lane line pipeline"
+[challenge_straight_lines]: ./examples/challenge_straight_lines.gif "Performance on the challenge video"
 
 ---
 
@@ -30,7 +26,10 @@ I found edges and lines in the image using the provided helper functions.  I pla
 
 ![alt text][pipelineOutputs]
 
-I classified detected lines into left and right groups using slope criteria.  I assumed lines belonging to the left lane line had slopes between 0.3 and 0.8 and those for the right lane line between -0.3 and -0.8.  Note that this method caused some trouble on the curved road in the challenge video! I then filtered the lines around the median, returning a subset of the lines that fell within 0.05 of the median slope and 50 pixels of the median intercept.  I then experimented with fitting a line, quadratic, or spline to the filtered lines.  I found that the linear fit did a pretty good job of highlighting the lanelines.  A quadratic fit or a spline with a slope prior near the bottom of the screen would allow for curved lane lines.  Finally, I drew line segments between the fitted points on the original image.  When drawing the lane lines, I started the line at the bottom of the image and extended the line upward to the last detected line segment (rather than to a fixed height on the image or the furthest visible point of the road).  Although this makes the line appear to jump up outward on the road in spurts, I feel showing the lines this way more accurately reflects the data going into the line calculation.
+I classified detected lines into left and right groups using slope criteria.  I assumed lines belonging to the left lane line had slopes between 0.3 and 0.8 and those for the right lane line between -0.3 and -0.8.  Note that this method caused some trouble on the curved road in the challenge video! I then filtered the lines around the median, returning a subset of the lines that fell within 0.05 of the median slope and 50 pixels of the median intercept.  I then experimented with fitting a line, quadratic, or spline to the filtered lines.  I found that the linear fit did a pretty good job of highlighting the lanelines.  A quadratic fit or a spline with a slope prior near the bottom of the screen would allow for curved lane lines.  Finally, I drew line segments between the fitted points on the original image.  When drawing the lane lines, I started the line at the bottom of the image and extended the line upward to the last detected line segment (rather than to a fixed height on the image or the furthest visible point of the road).  Although this makes the line appear to jump up outward on the road in spurts, I feel showing the lines this way more accurately reflects the data going into the line calculation.  The output of my pipeline on the "solidWhiteRight" and "solidYellowLeft" videos is shown below.
+
+![alt_text][solidWhiteRight]
+![alt_text][solidYellowLeft]
 
 ### 2. Identify potential shortcomings with your current pipeline
 
@@ -38,7 +37,9 @@ By far, the biggest shortcoming of this pipeline is that it is extremely difficu
 
 Another shortcoming of my pipeline is the region of interest.  If the road curves a lot, if the car is going up or down a hill, or if the car is changing lanes, the lines will go outside the region of interest I used.  I found that a more exapansive region of interest lead to too many false positives in the raw lines step, preventing accurate selection of the left and right groups of lines.
 
-To find left and right lane lines, I used a simple slope range criteria and then removed lines that were not within 0.05 of the median slope and within 50 of the median intercept. Median filtering is a very basic way of filtering out bad lines. A more robust method would be to fit a surface to the joint distribution of slopes and intercepts and take the two largest peaks that satisfy certain distance and prominance requirements.
+To find left and right lane lines, I used a simple slope range criteria and then removed lines that were not within 0.05 of the median slope and within 50 of the median intercept. Median filtering is a very basic way of filtering out bad lines. A more robust method would be to fit a surface to the joint distribution of slopes and intercepts and take the two largest peaks that satisfy certain distance and prominance requirements.  Selecting lane lines based on a surface would allow better lane line detection during curved road segments.  Lane segments in the upper section of the image have a shallower slope than do those nearer the car.  This discrepancy makes the output of my pipeline jump around when I ran it on the challenge video, as seen below.
+
+![alt_text][challenge_straight_lines]
 
 
 ### 3. Suggest possible improvements to your pipeline
@@ -47,5 +48,5 @@ One potential improvement would be to iteratively find the lane lines starting f
 
 A nother potential improvement would be to use a Kalman filter to smooth lane lines from frame to frame so that the occasional frame with incorrect lines doesn't have as much of an affect.
 
-I wonder to what extent Canny edge detectors and Hough transforms are still used in today's vision pipelines in industry.  Based on the trouble I've had tuning hyper-parameters and the possibility that a given region cannot be labeled using color or position alone, it seems likely that semantic segmentation or other deep learning methods will be needed to incorporate larger scale structure (such as other parked or moving cars, road barriers, trees, etc.), when deciding where the lane is.  If I was making a decision about the vision pipeline of a real self-driving car, I would probably only view my pipeline as perhaps a tool to create labled video with wich to train neural networks.
+I wonder to what extent Canny edge detectors and Hough transforms are still used in today's vision pipelines in industry.  Based on the trouble I've had tuning hyper-parameters and the possibility that a given region cannot be labeled using color or position alone, it seems likely that semantic segmentation or other deep learning methods will be needed to incorporate larger scale structure (such as other parked or moving cars, road barriers, trees, surface geometry and texture, etc.), when deciding where the lane is.  If I was making a decision about the vision pipeline of a real self-driving car, I would probably only view my pipeline as perhaps a tool to create labled video with wich to train neural networks.
 
