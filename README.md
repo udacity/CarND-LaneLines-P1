@@ -25,6 +25,7 @@ For this project, a great writeup should provide a detailed response to the "Ref
 
 3. Suggest possible improvements
 
+changed
 We encourage using images in your writeup to demonstrate how your pipeline works.  
 
 All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
