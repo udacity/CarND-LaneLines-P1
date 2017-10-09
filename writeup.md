@@ -15,8 +15,8 @@ The code to detect lane lines can be found in the P1.ipynb file. The primary cha
 
 [//]: # (Image References)
 
-[image1]: ./pipeline_steps/base.jpg "Base Image"
-[image2]: ./pipeline_steps/grey.jpg "Base Image"
+[image1]: pipeline_steps/base.jpg "Base Image"
+[image2]: pipeline_steps/grey.jpg "Greyscale Image"
 ---
 
 ### Reflection
