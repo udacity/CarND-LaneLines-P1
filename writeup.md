@@ -21,7 +21,7 @@ The code to detect lane lines can be found in the P1.ipynb file. The primary cha
 
 #### Pipeline
 
-My pipeline consisted of 6 steps. 
+My pipeline consisted of 5 steps. 
 ##### 1. Convert image to grayscale
 The initial image was converted to grayscale. This is done to get the image in a single channel form which can be processed by a canny edge detector used in future steps. Example of the conversion to grayscale can be seen below. 
 <br/>
