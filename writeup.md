@@ -30,10 +30,10 @@ In order to draw a single line on the left and right lanes, I modified the draw_
 
 If you'd like to include images to show how the pipeline works, here is how to include an image: 
 
-![Base Image](./pipeline_steps/base.jpg | width=480)
+<img src="./pipeline_steps/base.jpg" alt="Base Image" width="360">
 *Base image before pipeline is applied*
-\s
-![Greyscale Image](./pipeline_steps/greyscale.jpg | width=480)
+<br/>
+<img src="./pipeline_steps/grayscale.jpg" alt="Greyscale Image" width="360">
 *After image is converted to greyscale*
 \s
 
