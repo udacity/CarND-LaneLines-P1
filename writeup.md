@@ -15,16 +15,16 @@ The code to detect lane lines can be found in the P1.ipynb file. The primary cha
 
 [//]: # (Image References)
 
-[image1]: ./pipeline_steps/base.jpg "Base Image"
+[image1]: (./pipeline_steps/base.jpg "Base Image"
 [image2]: ./pipeline_steps/greyscale.jpg "Greyscale Image"
 ---
 
 ### Reflection
 
-## 1. Pipeline
+#### 1. Pipeline
 
 My pipeline consisted of 6 steps. 
-# 1. Convert image to greyscale
+##### 1. Convert image to greyscale
 The intial image was converted to greyscale. This is done to get the image in a single channel form which can be processed by a canny edge detector used in future steps. Example of the conversion to greyscale can be seen below.
 
 
@@ -32,8 +32,8 @@ In order to draw a single line on the left and right lanes, I modified the draw_
 
 If you'd like to include images to show how the pipeline works, here is how to include an image: 
 
-![alt text][image1]
-![alt text][image2]
+![Base Image](./pipeline_steps/base.jpg)
+![Greyscale Image](./pipeline_steps/greyscale.jpg)
 
 
 ### 2. Identify potential shortcomings with your current pipeline
