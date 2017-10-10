@@ -1,56 +1,82 @@
-# **Finding Lane Lines on the Road** 
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+# **Lane Lines Project: Writeup** 
 
-<img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
+## Author
+Michael McConnell
 
-Overview
+**Finding Lane Lines on the Road**
+
+The goals / steps of this project are the following:
+* Make a pipeline that finds lane lines on the road
+* Reflect on your work in a written report
+
+--- 
+### Code
+The code to detect lane lines can be found in the P1.ipynb file. The primary changes can be found in the process_single_img function which implements the computer vision pipeline for detecting lines. This detection is supplemented by an angle threshold and line averaging implemented in the draw_lines function. The resulting detected lane markings are overlayed on the provided images. Final output can be found in the test_images_output and test_video_output folders. 
+
+[//]: # (Image References)
+
 ---
 
-When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
+### Reflection
 
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
+#### Pipeline
 
-To complete the project, two files will be submitted: a file containing project code and a file containing a brief write up explaining your solution. We have included template files to be used both for the [code](https://github.com/udacity/CarND-LaneLines-P1/blob/master/P1.ipynb) and the [writeup](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md).The code file is called P1.ipynb and the writeup template is writeup_template.md 
+My pipeline consisted of 5 steps. 
+##### 1. Convert image to grayscale
+The initial image was converted to grayscale. This is done to get the image in a single channel form which can be processed by a canny edge detector used in future steps. Example of the conversion to grayscale can be seen below. 
+<br/>
+<img src="./pipeline_steps/base.jpg" alt="Base Image" width="360">
 
-To meet specifications in the project, take a look at the requirements in the [project rubric](https://review.udacity.com/#!/rubrics/322/view)
+*Base image before pipeline is applied*
+
+<br/>
+<img src="./pipeline_steps/grayscale.jpg" alt="Greyscale Image" width="360">
+
+*After image is converted to grayscale*
+
+##### 2. Gaussian Blur
+A gaussian blur is applied to reduce noise. A kernel of 5 was used which was found through trial and error. 
+<br/>
+<img src="./pipeline_steps/blur.jpg" alt="Gaussian Blur Image" width="360">
+
+*Image after Gaussian Blur*
+
+##### 3. Canny Edge Fliter
+To identify the edges of lane markings a Canny Edge filter is applied with a Low Threshold of 120 and a High Threshold of 240. These threshold gradient values were found through trial and error.   
+<br/>
+<img src="./pipeline_steps/edge.jpg" alt="Canny Edge Image" width="360">
+
+*Image after Canny Edge detector is applied*
+
+##### 4. Region of Interest (ROI)
+After tuning, the edges detected with canny included some edges which were not part of the lane markings. To remove these a region of interest was marked around the vehicle's lane of travel.
+<br/>
+<img src="./pipeline_steps/roi.jpg" alt="Canny Edge Image" width="360">
+
+*Image after region of interest was applied*
+
+##### 4. Hough Line Transform
+The edges remaining after the roi was applied were processed by Hough Line Transform to identify lines in the image. A rho of 2 and theta of 1 degree were used as the grid sizes in Hough Space. Lines were detected with an intersection threshold of 15. Lines were additionally filtered out by requiring a minimum pixel length of 20 and maximum line gap of 40 pixels. These values were found through trial and error.
+<br/>
+<img src="./pipeline_steps/lines.jpg" alt="Canny Edge Image" width="360">
+
+*Image after region of interest was applied*
+
+##### 5. Drawing lines
+The lines returned from the Hough Line Transform were additionally filtered in the draw_lines function. Here the angle of each line was calculated and only lines in the range [35, 45] were kept. Using the sign of the calculated angle the lines were clustered into right and left sides. The lines on each side were then averaged and the resulting two lines drawn on the image. This provided the final result an example of which is shown below.
+<br/>
+<img src="./pipeline_steps/final.jpg" alt="Canny Edge Image" width="360">
+
+*Final image with averaged lane markings*
+
+### Pipeline Weaknesses
+
+This pipeline has some limitations. It requires extensive parameter tuning to develop, and, as was demonstrated by the challenge video, it struggles when barriers parallel to lane markings provide an alternative edge which is detected. This issue was compounded be the lack of color validation. Additionally, the lane markings must be well defined for this pipeline to work. Old worn-down roads would certainly cause problems.
 
 
-Creating a Great Writeup
----
-For this project, a great writeup should provide a detailed response to the "Reflection" section of the [project rubric](https://review.udacity.com/#!/rubrics/322/view). There are three parts to the reflection:
+### Pipeline Improvements
 
-1. Describe the pipeline
+The pipeline could be improved through the addition of a color filter to prevent edges from non-lane markings be detected. 
 
-2. Identify any shortcomings
-
-3. Suggest possible improvements
-
-We encourage using images in your writeup to demonstrate how your pipeline works.  
-
-All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
-
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup. Here is a link to a [writeup template file](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md). 
-
-
-The Project
----
-
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project. ##
-
-**Step 1:** Set up the [CarND Term1 Starter Kit](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/83ec35ee-1e02-48a5-bdb7-d244bd47c2dc/lessons/8c82408b-a217-4d09-b81d-1bda4c6380ef/concepts/4f1870e0-3849-43e4-b670-12e6f2d4b7a7) if you haven't already.
-
-**Step 2:** Open the code in a Jupyter Notebook
-
-You will complete the project code in a Jupyter notebook.  If you are unfamiliar with Jupyter Notebooks, check out <A HREF="https://www.packtpub.com/books/content/basics-jupyter-notebook-and-python" target="_blank">Cyrille Rossant's Basics of Jupyter Notebook and Python</A> to get started.
-
-Jupyter is an Ipython notebook where you can run blocks of code and see results interactively.  All the code for this project is contained in a Jupyter notebook. To start Jupyter in your browser, use terminal to navigate to your project directory and then run the following command at the terminal prompt (be sure you've activated your Python 3 carnd-term1 environment as described in the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) installation instructions!):
-
-`> jupyter notebook`
-
-A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
-
-**Step 3:** Complete the project and submit both the Ipython notebook and the project writeup
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+Another improvement would be a comparison of the detected lane width. Since lane width is generally constant around the country it would provide a effective mechanism for filtering out detected lines.
 
