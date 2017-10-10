@@ -19,7 +19,7 @@ The code to detect lane lines can be found in the P1.ipynb file. The primary cha
 
 ### Reflection
 
-#### 1. Pipeline
+#### Pipeline
 
 My pipeline consisted of 6 steps. 
 ##### 1. Convert image to greyscale
@@ -28,6 +28,7 @@ The intial image was converted to greyscale. This is done to get the image in a 
 <img src="./pipeline_steps/base.jpg" alt="Base Image" width="360">
 
 *Base image before pipeline is applied*
+
 <br/>
 <img src="./pipeline_steps/grayscale.jpg" alt="Greyscale Image" width="360">
 
@@ -41,7 +42,7 @@ A gaussian blur is applied to reduce noise. A kernal of 5 was used which was fou
 *Image after Gaussian Blur*
 
 ##### 3. Canny Edge Fliter
-To identify the edges of lane markings a Canny Edge filter is applied. A Low Threshold of 120 and a High Threshold of 240. These threshold gradiant values were found through trial and error.  
+To identify the edges of lane markings a Canny Edge filter is applied with a Low Threshold of 120 and a High Threshold of 240. These threshold gradiant values were found through trial and error.  
 <br/>
 <img src="./pipeline_steps/edge.jpg" alt="Canny Edge Image" width="360">
 
@@ -62,22 +63,19 @@ The edges remaining after the roi was applied were processed by Hough Line Trans
 *Image after region of interest was applied*
 
 ##### 5. Drawing lines
-The lines returned from the Hough Line Transform were additionally filtered in the draw_lines function. Here the angle of each line was calculated and only lines in the range [35, 45] were kept. Using the sign of the calculated angle the lines were clustered into right and left sides. The lines on each side were then averaged and the resulting two lines drawn on the image. This provided the final result and example of which is shown below.
+The lines returned from the Hough Line Transform were additionally filtered in the draw_lines function. Here the angle of each line was calculated and only lines in the range [35, 45] were kept. Using the sign of the calculated angle the lines were clustered into right and left sides. The lines on each side were then averaged and the resulting two lines drawn on the image. This provided the final result an example of which is shown below.
 <br/>
 <img src="./pipeline_steps/final.jpg" alt="Canny Edge Image" width="360">
 
 *Final image with averaged lane markings*
 
-### 2. Identify potential shortcomings with your current pipeline
+### Pipeline Weaknesses
+
+This pipeline has some limitations. It requires extensive paramter tuning to develop, and, as was demonstrated by the challenge video, it struggles when barriers parallel to lane markings provide an alternative edge which is detected. This issue was compounded be the lack of color validation. Additionally, the lane markings must be well defined for this pipeline to work. Old worndown roads would certainly cause problems. 
 
 
-One potential shortcoming would be what would happen when ... 
+### Pipeline improvements
 
-Another shortcoming could be ...
+The pipeline could be improved through the addition of a color filter to prevent edges from non lane markings be detected. 
 
-
-### 3. Suggest possible improvements to your pipeline
-
-A possible improvement would be to ...
-
-Another potential improvement could be to ...
+Another improvement would be a comparison of the detected lane width. Since lane width is generally constand around the country it would provide a effective mechanism for filtering out detected lines. 
