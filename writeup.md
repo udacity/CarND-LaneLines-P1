@@ -32,8 +32,10 @@ If you'd like to include images to show how the pipeline works, here is how to i
 
 ![Base Image](./pipeline_steps/base.jpg =480x)
 *Base image before pipeline is applied*
+\s
 ![Greyscale Image](./pipeline_steps/greyscale.jpg =480x)
 *After image is converted to greyscale*
+\s
 
 
 ### 2. Identify potential shortcomings with your current pipeline
