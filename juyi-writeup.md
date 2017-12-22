@@ -53,5 +53,5 @@ A possible improvement would be to use B-Snake to do Lane detection and tracking
 * authors: Yue Wang, Eam Khwang Teoh, Dinggang Shen
 * http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.106.6644&rep=rep1&type=pdf
 
-<img src="./result_image/B-snake.png">B-snake</img><br>
+<img src="./result_image/B-Snake.png">B-snake</img><br>
 
