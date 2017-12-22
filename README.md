@@ -1,3 +1,3 @@
-* Use jp2.ipynb for test
+* Use jp3.ipynb for test
 
 * juyi-writeup.md for result
