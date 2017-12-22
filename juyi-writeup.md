@@ -28,7 +28,7 @@ My pipeline consisted of 5 steps:
 #### Output Images
 <img src="test_images_output/out_solidWhiteCurve.jpg" width="480" alt="solidWhiteCurve.jpg" /><br>
 <img src="test_images_output/out_solidWhiteRight.jpg" width="480" alt="solidWhiteRight.jpg" /><br>   
-<img src="test_images_output/out_out_solidYellowCurve.jpg" width="480" alt="solidYellowCurve.jpg" /><br>   
+<img src="test_images_output/out_solidYellowCurve.jpg" width="480" alt="solidYellowCurve.jpg" /><br>   
 <img src="test_images_output/out_solidYellowCurve2.jpg" width="480" alt="solidYellowCurve2.jpg" /><br>   
 <img src="test_images_output/out_solidYellowLeft.jpg" width="480" alt="solidYellowLeft.jpg" /><br>
 <img src="test_images_output/out_whiteCarLaneSwitch.jpg" width="480" alt="whiteCarLaneSwitch.jpg" /><br>    
