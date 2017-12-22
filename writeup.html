@@ -1,0 +1,66 @@
+<html>
+<head>    
+<title>
+ **Finding Lane Lines on the Road** 
+</title>
+<head>
+<body>    
+
+<h1>**Finding Lane Lines on the Road**</h1><br>
+
+The goals / steps of this project are the following:
+* Make a pipeline that finds lane lines on the road
+* Reflect on your work in a written report
+
+
+<h1>**Reflection**</h1><br>
+<h2>
+### 1. Describe your pipeline. As part of the description, explain how you modified the draw_lines() function.
+<h2><br>
+My pipeline consisted of 5 steps:<br>
+
+Step 1. Convert image to grayscale <br>
+Step 2. Apply a Gaussian blur to grayscale <br>
+Step 3. Apply Canny edge detection <br>
+Step 4. Use mask to reduce unnessary edges <br>
+Step 5. Apply Hough Transform <br>
+
+[image1]: ./result_image/01_edge.png      "Edges"
+[image1]: ./result_image/02_line_edge.png "Line Edges"
+[image1]: ./result_image/03_out_image.png "Output Image"
+
+<img src="result_image/01_edge.png" width="480" alt="Edges" /><br>
+<img src="result_image/02_line_edge.png" width="480" alt="Line Edges" /><br>
+<img src="result_image/03_out_image.png" width="480" alt="Output Image" /><br>
+    
+<h3>Output Images</h3>
+<img src="test_images_output/out_solidWhiteCurve.jpg" width="480" alt="solidWhiteCurve.jpg" /><br>
+<img src="test_images_output/out_solidWhiteRight.jpg" width="480" alt="solidWhiteRight.jpg" /><br>   
+<img src="test_images_output/out_solidYellowCurve.jpg" width="480" alt="solidYellowCurve.jpg" /><br>   
+<img src="test_images_output/out_solidYellowCurve2.jpg" width="480" alt="solidYellowCurve2.jpg" /><br>   
+<img src="test_images_output/out_solidYellowLeft.jpg" width="480" alt="solidYellowLeft.jpg" /><br>
+<img src="test_images_output/out_whiteCarLaneSwitch.jpg" width="480" alt="whiteCarLaneSwitch.jpg" /><br>    
+
+<h3>Output Videos</h3>
+<a href="test_videos_output/solidWhiteRight.mp4">solidWhiteRight.mp4</a><br>
+<a href="test_videos_output/solidYellowLeft.mp4">solidYellowLeft.mp4</a><br>
+<a href="test_videos_output/challenge.mp4">challenge.mp4</a><br>
+
+<h2>    
+### 2. Identify potential shortcomings with your current pipeline
+</h2><br>
+
+One potential shortcoming would be what would happen when it uses straight line to detect or mask curve lane.
+
+<h2>
+### 3. Suggest possible improvements to your pipeline
+</h2>
+    
+A possible improvement would be to use B-Snake to do Lane detection and tracking.<br>
+
+Paper:   <a href="http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.106.6644&rep=rep1&type=pdf">Lane detection and tracking using B-Snake</a><br>
+authors: Yue Wang, Eam Khwang Teoh, Dinggang Shen<br>
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.106.6644&rep=rep1&type=pdf<br>
+<img src="result_image/B-Snake.png" width="480" alt="B-Snake.png" /><br>    
+</body>
+</html>    
