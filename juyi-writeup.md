@@ -22,9 +22,21 @@ My pipeline consisted of 5 steps:
 * Step 5. Apply Hough Transform
 
 <img src="./result_image/01_edge.png">Edges</img><br>
-[image1]: ./result_image/01_edge.png      "Edges"
-[image2]: ./result_image/02_line_edge.png "Line Edges"
-[image3]: ./result_image/03_out_image.png "Output Image"
+<img src="./result_image/02_line_edge.png">Line Edges</img><br>
+<img src="./result_image/03_out_image.png">Output Image</img><br>
+
+#### Output Images
+<img src="test_images_output/out_solidWhiteCurve.jpg" width="480" alt="solidWhiteCurve.jpg" /><br>
+<img src="test_images_output/out_solidWhiteRight.jpg" width="480" alt="solidWhiteRight.jpg" /><br>   
+<img src="test_images_output/out_out_solidYellowCurve.jpg" width="480" alt="solidYellowCurve.jpg" /><br>   
+<img src="test_images_output/out_solidYellowCurve2.jpg" width="480" alt="solidYellowCurve2.jpg" /><br>   
+<img src="test_images_output/out_solidYellowLeft.jpg" width="480" alt="solidYellowLeft.jpg" /><br>
+<img src="test_images_output/out_whiteCarLaneSwitch.jpg" width="480" alt="whiteCarLaneSwitch.jpg" /><br>    
+
+#### Output Videos
+<a href="test_videos_output/solidWhiteRight.mp4">solidWhiteRight.mp4</a><br>
+<a href="test_videos_output/solidYellowLeft.mp4">solidYellowLeft.mp4</a><br>
+<a href="test_videos_output/challenge.mp4">challenge.mp4</a><br>
 
 
 ### 2. Identify potential shortcomings with your current pipeline
