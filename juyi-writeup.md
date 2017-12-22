@@ -21,9 +21,9 @@ My pipeline consisted of 5 steps:
 * Step 4. Use mask to reduce unnessary edges
 * Step 5. Apply Hough Transform
 
-[image1]: ./result_image/01_edge.png      "Edges"
-[image2]: ./result_image/02_line_edge.png "Line Edges"
-[image3]: ./result_image/03_out_image.png "Output Image"
+[image1]: (./result_image/01_edge.png      "Edges")
+[image2]: (./result_image/02_line_edge.png "Line Edges")
+[image3]: (./result_image/03_out_image.png "Output Image")
 
 
 ### 2. Identify potential shortcomings with your current pipeline
