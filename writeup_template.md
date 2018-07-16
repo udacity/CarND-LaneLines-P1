@@ -16,19 +16,39 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: ./examples/grayscale.jpg "Grayscale"
-
 ---
 
 ### Reflection
 
 ### 1. Describe your pipeline. As part of the description, explain how you modified the draw_lines() function.
 
-My pipeline consisted of 5 steps. First, I converted the images to grayscale, then I .... 
+First of all, the pipeline is written as a function. This is done to enable the use of the same pipeline for both the images as the videos. The pipeline consists of .. steps:
 
-In order to draw a single line on the left and right lanes, I modified the draw_lines() function by ...
-
-If you'd like to include images to show how the pipeline works, here is how to include an image: 
-
+1. Convert image to greyscale
+2. Define a kernel size and apply Gaussian smoothing
+3. Define parameters for Canny and apply
+4. Create a masked edges image
+5. Defining a four sided polygon to mask
+6. Define the Hough transform parameter
+7. Make a blank the same size as our image to draw on
+8. Run Hough on edge detected image
+9. Define variables to use for averaging and extrapolation and iterate over the output "lines"
+   - split left and right line
+   - skip all gradients not in between ±0.5 en ±2 to get rid of outliers
+   - find and store (variable) the end (left) and start (right) point of the line most-to-top of the picture
+   - calculate average gradient for both left and right line
+   - find line position on the bottom edge of the picture Y=(max y-resolution)
+   - extrapolate form bottom edge to y-top (= top of earlier defined polygon)
+ 10. Create a "color" binary image to combine with line image
+ 11. Draw the lines on the edge image
+ 
+ Included below are images showing the two important steps:
+ 1. Find max coordinate for both left and right and draw a line to the bottom of the image
+ 2. From bottom extrapolate to top of polygoon and draw line to the top
+ 
+ 
+   
+  
 ![alt text][image1]
 
 
