@@ -23,9 +23,16 @@ The goals / steps of this project are the following:
 
 ### 1. Describe your pipeline. As part of the description, explain how you modified the draw_lines() function.
 
-My pipeline consisted of 5 steps. First, I converted the images to grayscale, then I .... 
+My pipeline consisted of 5 steps. 
 
-In order to draw a single line on the left and right lanes, I modified the draw_lines() function by ...
+1. Convert the images to grayscale
+2. Apply the Gaussian smoothing function (blur)
+3. Apply Canny edge detection algorithm 
+4. Select the region of interest
+5. Apply Hough transform to detect line segments
+6. Combine the images and save it to output folder 
+
+In order to draw a single line on the left and right lanes, I modified the draw_lines() function by getting the lines' slopes and interecpt and making a selection based on that.
 
 If you'd like to include images to show how the pipeline works, here is how to include an image: 
 
@@ -34,14 +41,18 @@ If you'd like to include images to show how the pipeline works, here is how to i
 
 ### 2. Identify potential shortcomings with your current pipeline
 
+One potential shortcoming would be what would happen:
 
-One potential shortcoming would be what would happen when ... 
+1. Current program cane be optimized to process the images faster.
 
-Another shortcoming could be ...
+2. Also, It has not been tested for high resoltion image files, grayscale images.
 
 
 ### 3. Suggest possible improvements to your pipeline
 
-A possible improvement would be to ...
+Although the pipeline performs better on the SolddWhiteRight.mp4 and Solidyellowlefe.mp4 videos, it does seem to fail on the challeges.mp4 where the lane involves curving with some jiggling. 
+The algorithms can be tweeked to handle these by tweeking draw_line functons.
 
-Another potential improvement could be to ...
+Another improvement could be to see explore the ways if there is any jittering or movement in the camera recording in the curvings.
+
+Another potential improvement could be to handle all the color linings besides yellow and white.
