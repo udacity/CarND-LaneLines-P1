@@ -1,56 +1,103 @@
-# **Finding Lane Lines on the Road** 
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+# Finding Lane Lines on the Road
 
-<img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
+This is my first project of [Self-Driving Car Engineer nanodegree program](https://www.udacity.com/course/self-driving-car-engineer-nanodegree--nd013) in udacity.
 
-Overview
 ---
 
-When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
+## Overview
 
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
+The goals / steps of this project are the following:
+* Make a pipeline that finds lane lines on the road, using opencv and python
+* Reflect on my work
 
-To complete the project, two files will be submitted: a file containing project code and a file containing a brief write up explaining your solution. We have included template files to be used both for the [code](https://github.com/udacity/CarND-LaneLines-P1/blob/master/P1.ipynb) and the [writeup](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md).The code file is called P1.ipynb and the writeup template is writeup_template.md 
+[//]: # (Image References)
 
-To meet specifications in the project, take a look at the requirements in the [project rubric](https://review.udacity.com/#!/rubrics/322/view)
+[original]: test_images/solidWhiteCurve.jpg "Original"
+[image1]: ./examples/grayscale.jpg "Grayscale"
+[image2]: ./examples/blur.jpg "Blur"
+[image3]: ./examples/edge.jpg "Edge"
+[image4]: ./examples/masked_edge.jpg "Masked Edge"
+[image5]: ./examples/line.jpg "Line"
+[image6]: ./test_images_output/solidWhiteCurve.jpg "Image Output"
+[image7]: ./examples/example_output.gif "Video Output"
 
-
-Creating a Great Writeup
----
-For this project, a great writeup should provide a detailed response to the "Reflection" section of the [project rubric](https://review.udacity.com/#!/rubrics/322/view). There are three parts to the reflection:
-
-1. Describe the pipeline
-
-2. Identify any shortcomings
-
-3. Suggest possible improvements
-
-We encourage using images in your writeup to demonstrate how your pipeline works.  
-
-All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
-
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup. Here is a link to a [writeup template file](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md). 
-
-
-The Project
 ---
 
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project. ##
+## Reflection
 
-**Step 1:** Set up the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) if you haven't already.
+### 0. Setting
 
-**Step 2:** Open the code in a Jupyter Notebook
+To set it up to run this script at first, I followd this [starter kit](https://github.com/udacity/CarND-Term1-Starter-Kit) with docker. If you use mac and docker was installed successfuly, you can run jupyter notebook on your local machine by the command below.
 
-You will complete the project code in a Jupyter notebook.  If you are unfamiliar with Jupyter Notebooks, check out [Udacity's free course on Anaconda and Jupyter Notebooks](https://classroom.udacity.com/courses/ud1111) to get started.
+```sh
+docker run -it --rm --entrypoint "/run.sh" -p 8888:8888 -v `pwd`:/src udacity/carnd-term1-starter-kit
+```
 
-Jupyter is an Ipython notebook where you can run blocks of code and see results interactively.  All the code for this project is contained in a Jupyter notebook. To start Jupyter in your browser, use terminal to navigate to your project directory and then run the following command at the terminal prompt (be sure you've activated your Python 3 carnd-term1 environment as described in the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) installation instructions!):
+### 1. Pipeline step
 
-`> jupyter notebook`
+The origial image is shown below
+![alt text][original]
 
-A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
+My pipeline consisted of 5 steps.
+First, I converted the images to grayscale, and then applied Gaussian blur to that grayscaled image so that I can reduce image noise. Gaussian blur can be skipped because cv2.Canny I use next step do blur internally, by kernel size 5 × 5.
+However, I didn't skip because I found that 3 × 3 case made better result than that of 5 × 5. To detect edges in blurred image, I use Canny edge detection. I decide high / low threshold, 255 and 255/3 for that Canny but I couldn't find a convinced reason for that range. White see the test images, I found that lane line is mostly located in specific area, so I put four sided polygon to mask at the bottom half of the image.
 
-**Step 3:** Complete the project and submit both the Ipython notebook and the project writeup
+I got masked edge image from the pre-processing steps above. I implemented a Hough Transform to decide which lines pipelien should detect in image. I found lines close to the expected output, but there's a problem. Lines I found was often broken in the middle of lane when it couldn't see edge at the bottom of image.In order to draw a single line on the left and right lanes, I extrapolate line with numpy.polyfit. I do that by simply plugging in points that are outside of data set. I put original image and red line drawn image together.
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+...
 
+To wrap it up, Here is 5 steps in my pipeline.
+1. Convert original image to grayscale
+2. Applied Gaussian blur to grayscale image
+3. Detected edges in image by Canny edge detection
+4. Masked edge image to see only usuful region in image
+5. Drawed line in image by Hough transform.
+
+...
+
+1. Grayscaled image
+
+![alt text][image1]
+
+2. blurred image
+
+![alt text][image2]
+
+3. Edge on image
+
+![alt text][image3]
+
+4. Masked image
+
+![alt text][image4]
+
+5. Red line image
+
+![alt text][image5]
+
+6. final output(red line image + original image)
+
+![alt text][image6]
+
+The output in video format looks like this.
+
+![alt text][image7]
+
+You can see the codebase in [my jupyter notebook](./P1.ipynb).
+
+### 2. Potential shortcomings with my current pipeline
+
+One potential shortcoming would be that pipeline find it hard to get edges when it is bad weather like strong snow in night. Also, I only tested image in day but night image might make bad result because border can be a bit unseen relatively.
+
+Another shortcoming could be bad result when riding on the hill, mountain, and those of high hill place. Pipeline didn't consider the case that lane has slope.
+
+
+### 3. Improvements to pipeline
+
+A possible improvement would increate test dataset to see how bad or good my current pipleline can detect lane lines. Regardless of result, it might need more data.
+
+Another potential improvement could implement another edge detection or Hough transform to detect the lines in image. In addition to that, pre-process steps have more room to improvement. In this project, I manually change the paramenters in preprocess step, but it can improve more, like [this approach](https://medium.com/@maunesh/finding-the-right-parameters-for-your-computer-vision-algorithm-d55643b6f954)
+
+---
+## Reference
+[How to extrapolate lines with numpy.polyfit](https://peteris.rocks/blog/extrapolate-lines-with-numpy-polyfit/)
