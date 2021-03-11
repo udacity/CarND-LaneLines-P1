@@ -16,6 +16,9 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 
 [image1]: ./examples/grayscale.jpg "Grayscale"
+[result1]: ./result1.png "Grayscale"
+[result2]: ./result2.png "Grayscale"
+[result3]: ./result3.png "Grayscale"
 
 ---
 
@@ -25,30 +28,38 @@ The goals / steps of this project are the following:
 
 My pipeline consisted of 6 steps. 
 
-First, I converted the images to grayscale.
-Second, I defined a kernel size and apply Gaussian smoothing the gray image.
-Third, I defined parameters for Canny.
-Forth, I defined a ROI region with four sided polygon
-Fifth, I defined the hough transform parameters
-Sixth, Draw lines on the edge image
+Step 1. I converted the images to grayscale.
+Step 2. I defined a kernel size and apply Gaussian smoothing.
+Step 3. I defined parameters for Canny and apply.
+Step 4. I defined a ROI mask with four sided polygon.
+Step 5. I defined the hough transform parameters.
+Step 6. I drawed the lines on the edge image.
 
 In order to draw a single line on the left and right lanes, 
-I modified the draw_lines() function by calculating scopes of lines and delete unreasonable lines which has a degree out of range.
+I modified the draw_lines() function by calculating the scope of lines.
 
-If you'd like to include images to show how the pipeline works, here is how to include an image: 
+After calculating the scope of lines, I deleted the unreasonable lines which has a out of range about scope.
 
-![alt text][image1]
+The results of my pipelines are like below images.
+
+
+![alt text][result1]
+![alt text][result2]
 
 
 ### 2. Identify potential shortcomings with your current pipeline
 
-One potential shortcoming would be what would happen when ... 
+I think my code have some potential shortcomings.
 
-Another shortcoming could be ...
-
+As I just delete some unreasonable lane lines with scopes so it is dependent the 
+threshold of scopes conditions.
 
 ### 3. Suggest possible improvements to your pipeline
 
-A possible improvement would be to ...
+My code is possible improved by additional stretegy.
 
-Another potential improvement could be to ...
+If I can delete unuseful lines between two major lane lines of left and right side, it would be better than now.
+
+And If I can track the two side lines continuously with curvature not straight line, it would be better than now.
+
+![alt text][result3]
