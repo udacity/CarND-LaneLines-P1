@@ -13250,7 +13250,7 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.image.AxesImage at 0x7f24d185a320&gt;</pre>
+<pre>&lt;matplotlib.image.AxesImage at 0x7fbd52cb1320&gt;</pre>
 </div>
 
 </div>
@@ -13314,7 +13314,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[78]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
@@ -13380,19 +13380,92 @@ div#notebook {
 <span class="sd">    If you want to make the lines semi-transparent, think about combining</span>
 <span class="sd">    this function with the weighted_img() function below</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">img_width</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">img_height</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="n">x_left</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y_left</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">m_left</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">b_left</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">x_right</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y_right</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">m_right</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">b_right</span> <span class="o">=</span> <span class="p">[]</span>
+      
+    <span class="n">left_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">right_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="n">intersect_y_top</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">img_height</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="mi">5</span><span class="p">))</span>
+    <span class="n">intersect_y_bottom</span> <span class="o">=</span> <span class="n">img_height</span>
+    
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-        <span class="c1">#print(&#39;line:{}&#39;.format(line))</span>
         <span class="k">for</span> <span class="n">x1</span><span class="p">,</span><span class="n">y1</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
             <span class="c1">#print(&#39;x1:{},y1:{},x2:{},y2:{}&#39;.format(x1,y1,x2,y2))</span>
+            <span class="n">lane_m</span> <span class="o">=</span> <span class="p">(</span><span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">)</span>
+            <span class="n">lane_b</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">-</span> <span class="p">(</span><span class="n">x1</span><span class="o">*</span><span class="n">lane_m</span><span class="p">)</span>
             <span class="n">slope_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">x1</span><span class="o">-</span><span class="n">x2</span><span class="p">,</span><span class="n">y1</span><span class="o">-</span><span class="n">y2</span><span class="p">))</span>            
             <span class="c1">#print(&#39;slope: {}&#39;.format(slope_deg))</span>
+            <span class="c1">#print(&#39;lane m: {}&#39;.format(lane_m))</span>
             
-            <span class="k">if</span> <span class="p">(</span><span class="n">slope_deg</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">140</span> <span class="ow">and</span> <span class="n">slope_deg</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">100</span><span class="p">):</span>
-                <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">),</span> <span class="n">color</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="p">(</span><span class="n">slope_deg</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">70</span> <span class="ow">and</span> <span class="n">slope_deg</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">30</span><span class="p">):</span>
-                <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">),</span> <span class="n">color</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">slope_deg</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">60</span> <span class="ow">and</span> <span class="n">slope_deg</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">40</span><span class="p">):</span>
+            <span class="c1">#if (lane_m &lt; 0):</span>
+                <span class="n">x_left</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+                <span class="n">y_left</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+                <span class="n">x_left</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+                <span class="n">y_left</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+                <span class="n">m_left</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lane_m</span><span class="p">)</span>
+                <span class="n">b_left</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lane_b</span><span class="p">)</span>
+                
+                <span class="n">left_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                
+            <span class="k">elif</span> <span class="p">(</span><span class="n">slope_deg</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">130</span> <span class="ow">and</span> <span class="n">slope_deg</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">110</span><span class="p">):</span>
+            <span class="c1">#elif (lane_m &gt; 0):</span>
+                <span class="n">x_right</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+                <span class="n">y_right</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+                <span class="n">x_right</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+                <span class="n">y_right</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+                <span class="n">m_right</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lane_m</span><span class="p">)</span>
+                <span class="n">b_right</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lane_b</span><span class="p">)</span>
+                
+                <span class="n">right_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+              
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">pass</span>
+            
+        <span class="k">if</span> <span class="p">(</span><span class="n">left_cnt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="c1"># lane fitting 1st polynomial (y = mx + b)</span>
+            <span class="c1">#left_lane = np.polyfit(x_left, y_left, 1)</span>
+            <span class="n">avg_left_m</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">m_left</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">m_left</span><span class="p">)</span>
+            <span class="n">avg_left_b</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">b_left</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">b_left</span><span class="p">)</span>
+            
+            <span class="c1"># x = (y-b)/m</span>
+            <span class="n">x_left_max</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="n">intersect_y_top</span> <span class="o">-</span> <span class="n">avg_left_b</span><span class="p">)</span><span class="o">/</span><span class="n">avg_left_m</span><span class="p">))</span>
+            <span class="n">x_left_min</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="n">intersect_y_bottom</span> <span class="o">-</span> <span class="n">avg_left_b</span><span class="p">)</span><span class="o">/</span><span class="n">avg_left_m</span><span class="p">))</span>
+                
+            <span class="c1">#print(&#39;left max:{}&#39;.format(x_left_max))</span>
+            <span class="c1">#print(&#39;left min:{}&#39;.format(x_left_min))</span>
+                
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="n">x_left_max</span><span class="p">,</span> <span class="n">intersect_y_top</span><span class="p">),</span>\
+                    <span class="p">(</span><span class="n">x_left_min</span><span class="p">,</span> <span class="n">intersect_y_bottom</span><span class="p">),</span> <span class="n">color</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="n">right_cnt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="c1">#right_lane = np.polyfit(x_right, y_right, 1)</span>
+            <span class="n">avg_right_m</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">m_right</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">m_right</span><span class="p">)</span>
+            <span class="n">avg_right_b</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">b_right</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">b_right</span><span class="p">)</span>
+            
+            <span class="n">x_right_max</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="n">intersect_y_top</span> <span class="o">-</span> <span class="n">avg_right_b</span><span class="p">)</span><span class="o">/</span><span class="n">avg_right_m</span><span class="p">))</span>
+            <span class="n">x_right_min</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">int</span><span class="p">((</span><span class="n">intersect_y_bottom</span> <span class="o">-</span> <span class="n">avg_right_b</span><span class="p">)</span><span class="o">/</span><span class="n">avg_right_m</span><span class="p">))</span>
+                
+            <span class="c1">#print(&#39;right max:{}&#39;.format(x_right_max))</span>
+            <span class="c1">#print(&#39;right min:{}&#39;.format(x_right_min))</span>
+                
+            <span class="n">cv2</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="n">x_right_max</span><span class="p">,</span> <span class="n">intersect_y_top</span><span class="p">),</span>\
+                    <span class="p">(</span><span class="n">x_right_min</span><span class="p">,</span> <span class="n">intersect_y_bottom</span><span class="p">),</span> <span class="n">color</span><span class="p">,</span> <span class="n">thickness</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        
                 
 <span class="k">def</span> <span class="nf">hough_lines</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">min_line_len</span><span class="p">,</span> <span class="n">max_line_gap</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -13439,7 +13512,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[63]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -13456,7 +13529,7 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[4]:</div>
+    <div class="prompt output_prompt">Out[63]:</div>
 
 
 
@@ -13485,7 +13558,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[79]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># TODO: Build your pipeline that will draw lane lines on the test_images</span>
@@ -13535,13 +13608,13 @@ div#notebook {
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[5]:</div>
+    <div class="prompt output_prompt">Out[79]:</div>
 
 
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.image.AxesImage at 0x7f249bf54ac8&gt;</pre>
+<pre>&lt;matplotlib.image.AxesImage at 0x7fbd10981ac8&gt;</pre>
 </div>
 
 </div>
@@ -13554,7 +13627,7 @@ div#notebook {
 
 
 <div class="output_png output_subarea ">
-<img src="data:image/png;base64,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
+<img src="data:image/png;base64,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
 "
 >
 </div>
@@ -13609,7 +13682,7 @@ imageio.plugins.ffmpeg.download()</code></pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[80]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">process_image</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
@@ -13667,7 +13740,7 @@ imageio.plugins.ffmpeg.download()</code></pre>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[81]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">white_output</span> <span class="o">=</span> <span class="s1">&#39;test_videos_output/solidWhiteRight.mp4&#39;</span>
@@ -13707,7 +13780,7 @@ imageio.plugins.ffmpeg.download()</code></pre>
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>100%|█████████▉| 221/222 [00:19&lt;00:00, 10.46it/s]
+<pre>100%|█████████▉| 221/222 [00:09&lt;00:00, 22.87it/s]
 </pre>
 </div>
 </div>
@@ -13721,8 +13794,8 @@ imageio.plugins.ffmpeg.download()</code></pre>
 <pre>[MoviePy] Done.
 [MoviePy] &gt;&gt;&gt;&gt; Video ready: test_videos_output/solidWhiteRight.mp4 
 
-CPU times: user 2.92 s, sys: 285 ms, total: 3.2 s
-Wall time: 21.6 s
+CPU times: user 2.69 s, sys: 262 ms, total: 2.95 s
+Wall time: 10.6 s
 </pre>
 </div>
 </div>
@@ -13741,7 +13814,7 @@ Wall time: 21.6 s
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[82]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">HTML</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
@@ -13761,7 +13834,7 @@ Wall time: 21.6 s
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[9]:</div>
+    <div class="prompt output_prompt">Out[82]:</div>
 
 
 
@@ -13798,7 +13871,7 @@ Wall time: 21.6 s
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[83]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">yellow_output</span> <span class="o">=</span> <span class="s1">&#39;test_videos_output/solidYellowLeft.mp4&#39;</span>
@@ -13838,7 +13911,7 @@ Wall time: 21.6 s
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>100%|█████████▉| 681/682 [00:31&lt;00:00, 21.44it/s]
+<pre>100%|█████████▉| 681/682 [00:32&lt;00:00, 20.72it/s]
 </pre>
 </div>
 </div>
@@ -13852,8 +13925,8 @@ Wall time: 21.6 s
 <pre>[MoviePy] Done.
 [MoviePy] &gt;&gt;&gt;&gt; Video ready: test_videos_output/solidYellowLeft.mp4 
 
-CPU times: user 8.76 s, sys: 837 ms, total: 9.59 s
-Wall time: 32.7 s
+CPU times: user 8.59 s, sys: 709 ms, total: 9.3 s
+Wall time: 33.2 s
 </pre>
 </div>
 </div>
@@ -13864,7 +13937,7 @@ Wall time: 32.7 s
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[84]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">HTML</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
@@ -13884,7 +13957,7 @@ Wall time: 32.7 s
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[11]:</div>
+    <div class="prompt output_prompt">Out[84]:</div>
 
 
 
@@ -13920,7 +13993,7 @@ Wall time: 32.7 s
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[85]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">challenge_output</span> <span class="o">=</span> <span class="s1">&#39;test_videos_output/challenge.mp4&#39;</span>
@@ -13960,7 +14033,7 @@ Wall time: 32.7 s
 
 
 <div class="output_subarea output_stream output_stderr output_text">
-<pre>100%|██████████| 251/251 [00:26&lt;00:00,  9.45it/s]
+<pre>100%|██████████| 251/251 [00:27&lt;00:00,  9.23it/s]
 </pre>
 </div>
 </div>
@@ -13974,8 +14047,8 @@ Wall time: 32.7 s
 <pre>[MoviePy] Done.
 [MoviePy] &gt;&gt;&gt;&gt; Video ready: test_videos_output/challenge.mp4 
 
-CPU times: user 6.32 s, sys: 528 ms, total: 6.85 s
-Wall time: 28.6 s
+CPU times: user 6.47 s, sys: 444 ms, total: 6.92 s
+Wall time: 29.3 s
 </pre>
 </div>
 </div>
@@ -13986,7 +14059,7 @@ Wall time: 28.6 s
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[86]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">HTML</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
@@ -14006,7 +14079,7 @@ Wall time: 28.6 s
 
 <div class="output_area">
 
-    <div class="prompt output_prompt">Out[13]:</div>
+    <div class="prompt output_prompt">Out[86]:</div>
 
 
 
